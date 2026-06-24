@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Omnis Global Algo</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #3b82f6;
+    --accent: #6366f1;
+    --bg: #f3f4f6;
+    --sidebar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --border: #e5e7eb;
+    --danger: #ef4444;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --sidebar-width: 240px;
+    --header-height: 60px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== AUTH PAGES ===== */
+  .auth-page {
+    display: flex;
+    min-height: 100vh;
+  }
+  .auth-left {
+    flex: 1;
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 50%, #a5b4fc 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .auth-left-content {
+    text-align: left;
+    z-index: 1;
+  }
+  .auth-left-badge {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 16px;
+    padding: 30px 36px;
+    margin-bottom: 32px;
+    display: inline-block;
+  }
+  .auth-left-badge h2 { font-size: 2rem; font-weight: 800; line-height: 1.2; }
+  .auth-left-badge p { margin-top: 8px; opacity: 0.9; font-size: 0.95rem; }
+  .auth-tagline { font-size: 0.85rem; color: #374151; margin-bottom: 12px; }
+  .auth-shapes span {
+    position: absolute; font-size: 1.2rem; opacity: 0.3; color: #4f46e5;
+  }
+  .auth-right {
+    width: 420px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 40px;
+  }
+  .auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .auth-logo svg { width: 32px; height: 32px; }
+  .auth-logo span { font-size: 1.4rem; font-weight: 800; color: var(--text); }
+  .auth-right h1 { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin: 16px 0 6px; }
+  .auth-right p { color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-bottom: 24px; }
+  .btn-google {
+    width: 100%; padding: 12px; border: 1.5px solid var(--border);
+    border-radius: 8px; background: #f9fafb; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-size: 0.95rem; color: var(--text); margin-bottom: 16px; transition: background 0.2s;
+  }
+  .btn-google:hover { background: #f3f4f6; }
+  .auth-divider {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px; width: 100%;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .form-group { width: 100%; margin-bottom: 14px; }
+  .form-group input {
+    width: 100%; padding: 12px 16px; border: 1.5px solid var(--border);
+    border-radius: 8px; font-size: 0.95rem; background: #f9fafb;
+    outline: none; transition: border 0.2s;
+  }
+  .form-group input:focus { border-color: var(--primary); background: #fff; }
+  .form-group.password-wrap { position: relative; }
+  .form-group.password-wrap input { padding-right: 44px; }
+  .toggle-pw {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    cursor: pointer; color: var(--text-muted); background: none; border: none;
+  }
+  .forgot-link { text-align: right; width: 100%; margin-bottom: 18px; }
+  .forgot-link a { color: var(--primary); font-size: 0.85rem; text-decoration: none; }
+  .btn-primary {
+    width: 100%; padding: 13px; background: var(--primary);
+    color: #fff; border: none; border-radius: 8px; font-size: 1rem;
+    font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .auth-switch { margin-top: 20px; font-size: 0.88rem; color: var(--text-muted); text-align: center; }
+  .auth-switch a { color: var(--primary); font-weight: 600; text-decoration: none; }
+
+  /* ===== DISCLAIMER MODAL ===== */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center; z-index: 1000;
+  }
+  .modal-box {
+    background: #fff; border-radius: 16px; padding: 36px;
+    max-width: 560px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+  .modal-box h3 {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; color: var(--text);
+  }
+  .modal-box ul { padding-left: 18px; list-style: disc; }
+  .modal-box ul li { margin-bottom: 10px; font-size: 0.92rem; line-height: 1.6; color: var(--text); }
+  .modal-box ul li span { color: var(--primary); }
+  .modal-source {
+    font-size: 0.78rem; color: var(--text-muted); margin: 16px 0;
+    line-height: 1.5;
+  }
+  .modal-source a { color: var(--primary); }
+  .modal-accept {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 18px; font-size: 0.9rem; cursor: pointer;
+  }
+  .modal-accept input { width: 16px; height: 16px; cursor: pointer; }
+  .modal-accept a { color: var(--primary); }
+  .btn-understand {
+    width: 100%; padding: 13px; background: var(--primary-light);
+    color: #fff; border: none; border-radius: 8px; font-size: 1rem;
+    font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-understand:hover { background: var(--primary); }
+
+  /* ===== MAIN APP LAYOUT ===== */
+  .app-layout { display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0;
+    height: 100vh; z-index: 200;
+    transition: width 0.3s, transform 0.3s;
+  }
+  .sidebar.collapsed { width: 60px; }
+  .sidebar-logo {
+    padding: 18px 16px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border); min-height: var(--header-height);
+  }
+  .sidebar-logo svg { flex-shrink: 0; }
+  .sidebar-logo span {
+    font-size: 1rem; font-weight: 800; color: var(--text);
+    white-space: nowrap; overflow: hidden; transition: opacity 0.2s;
+  }
+  .sidebar.collapsed .sidebar-logo span { opacity: 0; width: 0; }
+  .sidebar-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 8px; cursor: pointer;
+    color: var(--text-muted); font-size: 0.9rem; font-weight: 500;
+    transition: all 0.15s; margin-bottom: 2px; white-space: nowrap;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: #eff6ff; color: var(--primary); }
+  .nav-item.active { background: var(--primary); color: #fff; }
+  .nav-item svg { flex-shrink: 0; }
+  .nav-label { transition: opacity 0.2s; overflow: hidden; }
+  .sidebar.collapsed .nav-label { opacity: 0; width: 0; }
+  .nav-chevron { margin-left: auto; transition: transform 0.2s; }
+  .nav-sub {
+    padding-left: 36px; overflow: hidden;
+    max-height: 0; transition: max-height 0.3s;
+  }
+  .nav-sub.open { max-height: 200px; }
+  .nav-sub-item {
+    padding: 7px 12px; font-size: 0.85rem; color: var(--text-muted);
+    cursor: pointer; border-radius: 6px; transition: color 0.15s;
+    display: block; text-decoration: none;
+  }
+  .nav-sub-item:hover, .nav-sub-item.active { color: var(--primary); }
+  .sidebar-user {
+    padding: 14px 14px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .user-avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+    overflow: hidden;
+  }
+  .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .user-info { overflow: hidden; }
+  .user-id { font-size: 0.7rem; color: var(--text-muted); }
+  .user-name { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar.collapsed .user-info { display: none; }
+
+  /* MAIN CONTENT */
+  .main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1; transition: margin-left 0.3s;
+    min-height: 100vh;
+  }
+  .main-content.expanded { margin-left: 60px; }
+
+  /* TOP BAR */
+  .topbar {
+    height: var(--header-height); background: #fff;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .collapse-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); padding: 6px; border-radius: 6px;
+    display: flex; align-items: center;
+  }
+  .collapse-btn:hover { background: var(--bg); }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .icon-btn {
+    background: none; border: none; cursor: pointer; color: var(--text-muted);
+    padding: 6px; border-radius: 6px; display: flex; align-items: center;
+  }
+  .icon-btn:hover { background: var(--bg); color: var(--text); }
+  .hamburger-btn {
+    display: none; background: none; border: none; cursor: pointer;
+    color: var(--text); padding: 6px;
+  }
+
+  /* PAGE CONTENT */
+  .page { padding: 24px; display: none; }
+  .page.active { display: block; }
+
+  /* ===== DASHBOARD ===== */
+  .page-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; }
+  .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+
+  .pnl-card {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border-radius: 16px; padding: 24px; color: #fff; position: relative; overflow: hidden;
+  }
+  .pnl-label { font-size: 0.85rem; opacity: 0.85; margin-bottom: 6px; }
+  .pnl-amount { font-size: 2rem; font-weight: 800; margin-bottom: 4px; }
+  .pnl-sub { font-size: 0.82rem; opacity: 0.75; margin-bottom: 24px; }
+  .pnl-user { font-size: 0.95rem; font-weight: 600; }
+  .pnl-icon {
+    position: absolute; right: 20px; bottom: 20px;
+    width: 36px; height: 36px; opacity: 0.7;
+  }
+
+  .broker-card, .deploy-card {
+    background: var(--card-bg); border-radius: 16px; padding: 24px;
+    border: 1px solid var(--border);
+  }
+  .card-label { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; }
+  .broker-name {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 1rem; font-weight: 600; margin-bottom: 14px;
+  }
+  .broker-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .broker-detail-item {}
+  .broker-detail-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 2px; }
+  .broker-detail-value { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+  .status-not-connected { color: var(--danger); }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+  .toggle-label { font-size: 0.82rem; color: var(--text-muted); }
+  .toggle {
+    width: 40px; height: 22px; background: #d1d5db; border-radius: 11px;
+    position: relative; cursor: pointer; transition: background 0.2s;
+  }
+  .toggle.on { background: var(--primary); }
+  .toggle::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%; background: #fff;
+    transition: left 0.2s;
+  }
+  .toggle.on::after { left: 21px; }
+
+  .deploy-card { text-align: center; }
+  .deploy-icon { margin: 8px auto 16px; color: var(--text-muted); }
+  .deploy-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  .deploy-card p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 18px; }
+  .btn-create {
+    background: var(--primary); color: #fff; border: none;
+    padding: 10px 22px; border-radius: 8px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-create:hover { background: var(--primary-dark); }
+
+  /* Strategy Templates */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+  }
+  .section-title { font-size: 1.1rem; font-weight: 700; }
+  .section-controls { display: flex; align-items: center; gap: 10px; }
+  .see-all { color: var(--primary); font-size: 0.88rem; cursor: pointer; text-decoration: none; font-weight: 500; }
+  .page-controls { display: flex; align-items: center; gap: 6px; }
+  .page-btn {
+    width: 28px; height: 28px; border: 1px solid var(--border);
+    background: #fff; border-radius: 6px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+  }
+  .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .templates-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .template-card {
+    background: var(--card-bg); border-radius: 12px;
+    padding: 20px; border: 1px solid var(--border);
+  }
+  .template-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; }
+  .template-card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 4px; }
+  .read-more { color: var(--primary); font-size: 0.8rem; cursor: pointer; }
+  .btn-add {
+    width: 100%; margin-top: 14px; padding: 9px;
+    background: var(--primary); color: #fff; border: none;
+    border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-add:hover { background: var(--primary-dark); }
+
+  /* Strategy Deployed top right */
+  .deploy-select {
+    display: flex; align-items: center; gap: 8px;
+    background: #fff; border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 8px; cursor: pointer;
+    font-size: 0.85rem; color: var(--text-muted);
+  }
+
+  /* ===== BROKER PAGE ===== */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+  }
+  .page-header h2 { font-size: 1.3rem; font-weight: 700; }
+  .page-header p { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+  .btn-add-broker {
+    background: var(--primary); color: #fff; border: none;
+    padding: 10px 20px; border-radius: 8px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+  .broker-list-card {
+    background: var(--card-bg); border-radius: 12px;
+    border: 1px solid var(--border); overflow: hidden;
+  }
+  .broker-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+  }
+  .broker-row:last-child { border-bottom: none; }
+  .broker-logo {
+    width: 48px; height: 48px; border-radius: 8px; background: #fff5e6;
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+  .broker-info { flex: 1; }
+  .broker-info strong { display: block; font-size: 0.95rem; font-weight: 700; }
+  .broker-info span { font-size: 0.8rem; color: var(--text-muted); }
+  .broker-info .not-connected { color: var(--danger); font-size: 0.8rem; }
+  .broker-perf { text-align: center; }
+  .broker-perf span { font-size: 0.75rem; color: var(--text-muted); }
+  .broker-perf strong { display: block; font-size: 1rem; font-weight: 700; }
+  .broker-toggles { display: flex; align-items: center; gap: 20px; }
+  .toggle-item { text-align: center; }
+  .toggle-item span { font-size: 0.72rem; color: var(--text-muted); display: block; margin-bottom: 4px; }
+  .kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; padding: 4px 8px; }
+
+  /* ===== STRATEGIES ===== */
+  .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+  .tab {
+    padding: 10px 20px; font-size: 0.9rem; font-weight: 500;
+    color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -2px; transition: all 0.2s;
+  }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .strategies-toolbar {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+  }
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: #fff; border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 9px 14px; width: 300px;
+  }
+  .search-box input { border: none; outline: none; font-size: 0.9rem; background: transparent; width: 100%; }
+  .toolbar-right { display: flex; gap: 10px; }
+  .btn-tab {
+    padding: 9px 18px; border-radius: 8px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-tab.active { background: var(--primary); color: #fff; border: 2px solid var(--primary); }
+  .btn-tab.inactive { background: #fff; color: var(--text-muted); border: 2px solid var(--border); }
+  .empty-state {
+    text-align: center; padding: 80px 20px;
+  }
+  .empty-icon {
+    width: 100px; height: 100px; background: #f3f4f6; border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px; font-size: 2.5rem; color: #d1d5db;
+  }
+  .empty-state h3 { display: none; }
+  .btn-create-lg {
+    background: var(--primary); color: #fff; border: none;
+    padding: 12px 28px; border-radius: 8px; font-size: 0.95rem;
+    font-weight: 600; cursor: pointer; margin-top: 20px;
+  }
+
+  /* Strategy cards */
+  .strategy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .strategy-card {
+    background: var(--card-bg); border-radius: 12px;
+    border: 1px solid var(--border); padding: 20px;
+  }
+  .strategy-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .strategy-card h4 { font-size: 0.92rem; font-weight: 700; }
+  .strategy-badge {
+    font-size: 0.72rem; padding: 3px 8px; border-radius: 20px;
+    font-weight: 600;
+  }
+  .badge-options { background: #eff6ff; color: var(--primary); }
+  .badge-equity { background: #f0fdf4; color: var(--success); }
+  .strategy-card p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
+  .strategy-card-footer { display: flex; gap: 8px; }
+  .btn-sm {
+    flex: 1; padding: 8px; border-radius: 6px; font-size: 0.8rem;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-sm.primary { background: var(--primary); color: #fff; border: none; }
+  .btn-sm.outline { background: #fff; color: var(--primary); border: 1.5px solid var(--primary); }
+
+  /* ===== BACKTESTING ===== */
+  .simulator-container { display: grid; grid-template-columns: 380px 1fr; gap: 0; background: #fff; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; min-height: 600px; }
+  .option-chain-panel { border-right: 1px solid var(--border); }
+  .oc-header { padding: 16px; border-bottom: 1px solid var(--border); }
+  .oc-header h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+  .oc-date { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+  .oc-date-btn { background: #f3f4f6; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+  .live-badge { background: var(--primary); color: #fff; font-size: 0.72rem; padding: 3px 10px; border-radius: 6px; font-weight: 600; }
+  .expiry-tabs { display: flex; overflow-x: auto; padding: 10px 16px; gap: 8px; border-bottom: 1px solid var(--border); }
+  .expiry-tab { white-space: nowrap; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; border: 1px solid var(--border); background: #fff; }
+  .expiry-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .oc-symbol-row { padding: 10px 16px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+  .oc-table { width: 100%; font-size: 0.8rem; }
+  .oc-table th { padding: 8px 12px; text-align: left; color: var(--text-muted); font-weight: 600; font-size: 0.75rem; border-bottom: 1px solid var(--border); }
+  .oc-table td { padding: 7px 12px; border-bottom: 1px solid #f3f4f6; }
+  .oc-strike { font-weight: 700; background: #f8fafc; }
+  .btn-bs { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; border: 1px solid; cursor: pointer; }
+  .btn-b { background: #eff6ff; color: var(--primary); border-color: var(--primary); }
+  .btn-s { background: #fff0f0; color: var(--danger); border-color: var(--danger); }
+  .payoff-panel { padding: 20px; }
+  .payoff-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+  .payoff-tab { padding: 7px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; border: 1px solid var(--border); background: #fff; }
+  .payoff-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .payoff-metrics { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .metric-item {}
+  .metric-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+  .metric-value { font-size: 0.88rem; font-weight: 700; margin-top: 3px; }
+  .payoff-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-muted); font-size: 0.9rem; }
+  .payoff-empty svg { margin-bottom: 12px; opacity: 0.4; }
+
+  /* Simulator time bar */
+  .sim-timebar { overflow-x: auto; background: #fff; border-bottom: 1px solid var(--border); padding: 0 8px; display: flex; align-items: center; gap: 2px; height: 44px; }
+  .sim-timebar button { padding: 4px 10px; border: none; background: none; cursor: pointer; font-size: 0.78rem; color: var(--text-muted); border-radius: 4px; white-space: nowrap; }
+  .sim-timebar button:hover { background: #f3f4f6; }
+  .sim-timebar button.active { background: var(--primary); color: #fff; }
+  .sim-symbol-select { background: #f3f4f6; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; cursor: pointer; }
+  .sim-date-btn { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 4px 12px; font-size: 0.78rem; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+
+  /* ===== REPORTS ===== */
+  .report-header { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+  .date-input { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; }
+  .date-input input { border: 1.5px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 0.85rem; }
+  .broker-select { border: 1.5px solid var(--border); border-radius: 6px; padding: 7px 14px; font-size: 0.85rem; }
+  .report-toggle-group { display: flex; border: 2px solid var(--primary); border-radius: 8px; overflow: hidden; }
+  .report-toggle { padding: 7px 16px; font-size: 0.85rem; font-weight: 600; cursor: pointer; background: #fff; color: var(--primary); border: none; }
+  .report-toggle.active { background: var(--primary); color: #fff; }
+  .btn-get-reports { background: var(--primary); color: #fff; border: none; padding: 8px 20px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+  .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .report-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .report-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 16px; }
+  .piechart-empty { width: 120px; height: 120px; border-radius: 50%; border: 12px solid #f3f4f6; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .piechart-empty span { font-size: 0.72rem; color: var(--text-muted); }
+  .piechart-empty strong { font-size: 0.95rem; font-weight: 700; }
+  .no-data { color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 40px; }
+  .no-strategies { text-align: center; padding: 20px; color: var(--primary); font-size: 0.88rem; }
+
+  /* ===== SUBSCRIPTIONS ===== */
+  .sub-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 24px; }
+  .billing-toggle { display: flex; gap: 8px; margin-bottom: 28px; }
+  .billing-btn { padding: 9px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: 2px solid var(--border); background: #fff; color: var(--text-muted); }
+  .billing-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .plan-card { background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 16px; padding: 28px; }
+  .plan-card.featured { border-color: var(--primary); box-shadow: 0 4px 24px rgba(37,99,235,0.12); }
+  .plan-name { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+  .plan-price { font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
+  .plan-price span { font-size: 0.85rem; font-weight: 400; color: var(--text-muted); }
+  .plan-active { color: var(--success); font-weight: 600; font-size: 0.9rem; border: 1.5px solid var(--success); border-radius: 8px; padding: 9px; text-align: center; margin: 14px 0; }
+  .plan-features h5 { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px; font-weight: 600; }
+  .plan-features ul { list-style: none; }
+  .plan-features li { font-size: 0.83rem; color: var(--text); margin-bottom: 7px; padding-left: 16px; position: relative; }
+  .plan-features li::before { content: '•'; position: absolute; left: 0; color: var(--primary); }
+  .plan-features li.warn { color: var(--primary); }
+  .btn-get-started { width: 100%; padding: 11px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin: 14px 0; }
+  .btn-get-started.outline { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
+
+  /* ===== STRATEGY BUILDER ===== */
+  .builder-layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; }
+  .builder-sidebar { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .builder-sidebar h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 14px; }
+  .builder-field { margin-bottom: 14px; }
+  .builder-field label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 5px; }
+  .builder-field select, .builder-field input { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.85rem; outline: none; }
+  .builder-main { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .builder-section { margin-bottom: 20px; }
+  .builder-section-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 12px; color: var(--text-muted); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.5px; }
+  .condition-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .condition-row select { flex: 1; min-width: 100px; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 0.85rem; }
+  .btn-add-condition { background: none; border: 1.5px dashed var(--border); border-radius: 6px; padding: 8px 16px; font-size: 0.82rem; color: var(--text-muted); cursor: pointer; }
+  .btn-add-condition:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* ===== MOBILE OVERLAY ===== */
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4); z-index: 150;
+  }
+
+  /* ===== NOTIFICATIONS ===== */
+  .toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: #1f2937; color: #fff; padding: 12px 20px;
+    border-radius: 10px; font-size: 0.88rem; z-index: 9999;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s; max-width: 300px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ===== PROFILE DROPDOWN ===== */
+  .profile-menu {
+    position: relative;
+  }
+  .profile-btn {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--primary);
+    color: #fff; font-weight: 700; font-size: 0.82rem; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+  }
+  .profile-dropdown {
+    position: absolute; right: 0; top: calc(100% + 8px);
+    background: #fff; border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12); min-width: 200px; z-index: 300;
+    display: none; overflow: hidden;
+  }
+  .profile-dropdown.open { display: block; }
+  .profile-dropdown-header { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .profile-dropdown-header strong { display: block; font-size: 0.9rem; }
+  .profile-dropdown-header span { font-size: 0.78rem; color: var(--text-muted); }
+  .profile-dropdown-item {
+    padding: 11px 16px; font-size: 0.88rem; cursor: pointer;
+    display: flex; align-items: center; gap: 10px; color: var(--text);
+    transition: background 0.15s;
+  }
+  .profile-dropdown-item:hover { background: #f9fafb; }
+  .profile-dropdown-item.danger { color: var(--danger); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1100px) {
+    .dashboard-grid { grid-template-columns: 1fr 1fr; }
+    .templates-grid { grid-template-columns: 1fr 1fr; }
+    .plans-grid { grid-template-columns: 1fr; }
+    .payoff-metrics { grid-template-columns: repeat(3, 1fr); }
+    .simulator-container { grid-template-columns: 1fr; }
+    .payoff-panel { border-top: 1px solid var(--border); }
+  }
+
+  @media (max-width: 768px) {
+    :root { --sidebar-width: 240px; }
+    .sidebar {
+      transform: translateX(-100%);
+      box-shadow: none;
+    }
+    .sidebar.mobile-open {
+      transform: translateX(0);
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    }
+    .sidebar-overlay { display: block; pointer-events: none; opacity: 0; transition: opacity 0.3s; }
+    .sidebar-overlay.open { pointer-events: all; opacity: 1; }
+    .main-content { margin-left: 0 !important; }
+    .hamburger-btn { display: flex !important; }
+    .collapse-btn { display: none; }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .templates-grid { grid-template-columns: 1fr; }
+    .plans-grid { grid-template-columns: 1fr; }
+    .auth-left { display: none; }
+    .auth-right { width: 100%; padding: 40px 24px; }
+    .page { padding: 16px; }
+    .page-title { font-size: 1.2rem; }
+    .page-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .search-box { width: 100%; }
+    .strategies-toolbar { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .report-grid { grid-template-columns: 1fr; }
+    .report-header { flex-direction: column; align-items: flex-start; }
+    .builder-layout { grid-template-columns: 1fr; }
+    .simulator-container { grid-template-columns: 1fr; }
+    .payoff-metrics { grid-template-columns: repeat(2, 1fr); }
+    .broker-row { flex-wrap: wrap; }
+    .broker-toggles { flex-wrap: wrap; }
+    .modal-box { padding: 24px 20px; }
+    .sim-timebar { padding: 0 4px; }
+    .tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; }
+  }
+
+  @media (max-width: 480px) {
+    .auth-right { padding: 32px 20px; }
+    .topbar { padding: 0 14px; }
+    .page { padding: 12px; }
+    .pnl-card { padding: 18px; }
+    .pnl-amount { font-size: 1.6rem; }
+    .billing-toggle { flex-wrap: wrap; }
+    .payoff-metrics { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* Strategy Builder page */
+  .coming-soon-card {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+    padding: 60px 40px; text-align: center;
+  }
+  .coming-soon-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+  .coming-soon-card p { color: var(--text-muted); font-size: 0.9rem; }
+
+  /* Hidden utility */
+  .hidden { display: none !important; }
+  
+  /* Scrollable option chain */
+  .oc-body { max-height: 500px; overflow-y: auto; }
+
+  /* Strategy template section on dashboard */
+  .dash-deploy-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  /* Add broker modal */
+  .add-broker-modal .modal-box { max-width: 440px; }
+  .broker-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .broker-option {
+    border: 1.5px solid var(--border); border-radius: 10px; padding: 14px;
+    text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .broker-option:hover, .broker-option.selected { border-color: var(--primary); background: #eff6ff; }
+  .broker-option .bname { font-size: 0.82rem; font-weight: 600; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<!-- ==================== AUTH: SIGN IN ==================== -->
+<div id="signInPage" class="auth-page">
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="auth-left-badge">
+        <h2>Turn ideas<br>into winning<br>trades.</h2>
+        <p>Test. Optimize. Execute.<br>All in one place.</p>
+      </div>
+      <div class="auth-tagline">#Trading &nbsp;#Stockmarket &nbsp;#Strategy &nbsp;&nbsp;<strong>Try now</strong></div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-logo">
+      <svg viewBox="0 0 32 32" fill="none"><polygon points="4,28 16,4 28,28" fill="#2563eb"/><polygon points="10,28 16,16 22,28" fill="#7c3aed" opacity="0.7"/></svg>
+      <span>Omnis Global Algo</span>
+    </div>
+    <h1>Sign In</h1>
+    <p>Login into your account to start adding strategies to your trades!</p>
+    <button class="btn-google" onclick="handleGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+    <div class="auth-divider">Or</div>
+    <div class="form-group">
+      <input type="text" id="loginEmail" placeholder="Email Id / Client Id">
+    </div>
+    <div class="form-group password-wrap">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button class="toggle-pw" onclick="togglePw('loginPassword',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="forgot-link"><a href="#" onclick="showPage('forgotPage')">Forget Password?</a></div>
+    <button class="btn-primary" onclick="handleLogin()">Log In</button>
+    <div class="auth-switch">Don't have account? <a href="#" onclick="showPage('signUpPage')">Sign Up</a></div>
+  </div>
+</div>
+
+<!-- ==================== AUTH: SIGN UP ==================== -->
+<div id="signUpPage" class="auth-page hidden">
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="auth-left-badge">
+        <h2>Turn ideas<br>into winning<br>trades.</h2>
+        <p>Test. Optimize. Execute.<br>All in one place.</p>
+      </div>
+      <div class="auth-tagline">#Trading &nbsp;#Stockmarket &nbsp;#Strategy &nbsp;&nbsp;<strong>Try now</strong></div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-logo">
+      <svg viewBox="0 0 32 32" fill="none"><polygon points="4,28 16,4 28,28" fill="#2563eb"/><polygon points="10,28 16,16 22,28" fill="#7c3aed" opacity="0.7"/></svg>
+      <span>Omnis Global Algo</span>
+    </div>
+    <h1>Sign Up</h1>
+    <p>Create your account to start algorithmic trading!</p>
+    <button class="btn-google" onclick="handleGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+    <div class="auth-divider">Or</div>
+    <div class="form-group"><input type="text" id="regName" placeholder="Full Name"></div>
+    <div class="form-group"><input type="email" id="regEmail" placeholder="Email Id"></div>
+    <div class="form-group"><input type="text" id="regClient" placeholder="Client Id (optional)"></div>
+    <div class="form-group password-wrap">
+      <input type="password" id="regPassword" placeholder="Password">
+      <button class="toggle-pw" onclick="togglePw('regPassword',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div class="form-group password-wrap">
+      <input type="password" id="regConfirm" placeholder="Confirm Password">
+      <button class="toggle-pw" onclick="togglePw('regConfirm',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <button class="btn-primary" onclick="handleRegister()">Create Account</button>
+    <div class="auth-switch">Already have an account? <a href="#" onclick="showPage('signInPage')">Sign In</a></div>
+  </div>
+</div>
+
+<!-- ==================== FORGOT PASSWORD ==================== -->
+<div id="forgotPage" class="auth-page hidden">
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="auth-left-badge">
+        <h2>Turn ideas<br>into winning<br>trades.</h2>
+        <p>Test. Optimize. Execute.<br>All in one place.</p>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-logo">
+      <svg viewBox="0 0 32 32" fill="none"><polygon points="4,28 16,4 28,28" fill="#2563eb"/><polygon points="10,28 16,16 22,28" fill="#7c3aed" opacity="0.7"/></svg>
+      <span>Omnis Global Algo</span>
+    </div>
+    <h1 style="color:var(--text)">Forgot Password</h1>
+    <p>Enter your email and we'll send you a reset link.</p>
+    <div class="form-group"><input type="email" id="forgotEmail" placeholder="Email Id"></div>
+    <button class="btn-primary" onclick="handleForgot()">Send Reset Link</button>
+    <div class="auth-switch"><a href="#" onclick="showPage('signInPage')">← Back to Sign In</a></div>
+  </div>
+</div>
+
+<!-- ==================== DISCLAIMER MODAL ==================== -->
+<div id="disclaimerModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3>
+      <svg width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Risk disclosures on derivatives
+    </h3>
+    <ul>
+      <li><span>9 out of 10</span> individual traders in equity Futures and Options Segment, incurred net losses.</li>
+      <li>On an average, loss makers registered net trading loss close to <span>₹50,000</span>.</li>
+      <li>Over and above the net trading losses incurred, loss makers expended an additional <span>28%</span> of net trading losses as transaction costs.</li>
+      <li>Those making net trading profits, incurred between <span>15% to 50%</span> of such profits as transaction cost.</li>
+    </ul>
+    <p class="modal-source">Source: <a href="#">SEBI</a> study dated January 25, 2023 on "Analysis of Profit and Loss of Individual Traders dealing in equity Futures and Options (F&O) Segment", wherein Aggregate Level findings are based on annual Profit/Loss incurred by individual traders in equity F&O during FY 2021-22.</p>
+    <label class="modal-accept">
+      <input type="checkbox" id="acceptTerms">
+      I accept all the <a href="#">Terms &amp; Conditions</a>
+    </label>
+    <button class="btn-understand" onclick="acceptDisclaimer()">I Understand</button>
+  </div>
+</div>
+
+<!-- ==================== ADD BROKER MODAL ==================== -->
+<div id="addBrokerModal" class="modal-overlay hidden add-broker-modal">
+  <div class="modal-box">
+    <h3>Add Broker</h3>
+    <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">Select your broker to connect</p>
+    <div class="broker-options">
+      <div class="broker-option" onclick="selectBroker(this,'Angel One')">
+        <div style="font-size:1.5rem">🅰️</div>
+        <div class="bname">Angel One</div>
+      </div>
+      <div class="broker-option" onclick="selectBroker(this,'Zerodha')">
+        <div style="font-size:1.5rem">🔵</div>
+        <div class="bname">Zerodha</div>
+      </div>
+      <div class="broker-option" onclick="selectBroker(this,'Upstox')">
+        <div style="font-size:1.5rem">🟠</div>
+        <div class="bname">Upstox</div>
+      </div>
+      <div class="broker-option" onclick="selectBroker(this,'Fyers')">
+        <div style="font-size:1.5rem">🟢</div>
+        <div class="bname">Fyers</div>
+      </div>
+      <div class="broker-option" onclick="selectBroker(this,'5Paisa')">
+        <div style="font-size:1.5rem">🔴</div>
+        <div class="bname">5Paisa</div>
+      </div>
+      <div class="broker-option" onclick="selectBroker(this,'Dhan')">
+        <div style="font-size:1.5rem">🟣</div>
+        <div class="bname">Dhan</div>
+      </div>
+    </div>
+    <div class="form-group"><input type="text" id="brokerClientId" placeholder="Client ID / API Key"></div>
+    <div class="form-group password-wrap">
+      <input type="password" id="brokerSecret" placeholder="API Secret / Password">
+      <button class="toggle-pw" onclick="togglePw('brokerSecret',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button class="btn-primary" onclick="saveBroker()">Connect Broker</button>
+      <button onclick="closeModal('addBrokerModal')" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-size:0.9rem;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MAIN APP ==================== -->
+<div id="mainApp" class="app-layout hidden">
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none"><polygon points="4,28 16,4 28,28" fill="#2563eb"/><polygon points="10,28 16,16 22,28" fill="#7c3aed" opacity="0.7"/></svg>
+      <span>Omnis Global Algo</span>
+    </div>
+    <div class="sidebar-nav">
+      <a class="nav-item active" onclick="navigateTo('dashboard',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a class="nav-item" onclick="navigateTo('broker',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z"/></svg>
+        <span class="nav-label">Broker</span>
+      </a>
+      <a class="nav-item" onclick="navigateTo('strategyBuilder',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span class="nav-label">Strategy Builder</span>
+      </a>
+      <a class="nav-item" onclick="navigateTo('strategies',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <span class="nav-label">Strategies</span>
+      </a>
+      <a class="nav-item" onclick="toggleBacktestMenu(this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        <span class="nav-label">Backtesting</span>
+        <svg class="nav-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </a>
+      <div class="nav-sub" id="backtestSubmenu">
+        <a class="nav-sub-item" onclick="navigateTo('backtest',null)">• Strategy Backtest</a>
+        <a class="nav-sub-item" onclick="navigateTo('simulator',null)">• Simulator (Beta)</a>
+      </div>
+      <a class="nav-item" onclick="navigateTo('reports',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span class="nav-label">Reports</span>
+      </a>
+      <a class="nav-item" onclick="navigateTo('subscription',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        <span class="nav-label">Subscription</span>
+      </a>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">NG</div>
+      <div class="user-info">
+        <div class="user-id" id="sidebarUserId">AR361794</div>
+        <div class="user-name" id="sidebarUserName">Nishantgiri Goswammi</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content" id="mainContent">
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger-btn" onclick="toggleMobileSidebar()">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <button class="collapse-btn" onclick="toggleSidebar()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" title="Keyboard shortcuts">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M18 12h.01M10 12h4M6 16h12"/></svg>
+        </button>
+        <button class="icon-btn" title="Theme">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </button>
+        <button class="icon-btn" title="Notifications" onclick="showToast('No new notifications')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </button>
+        <div class="profile-menu">
+          <button class="profile-btn" onclick="toggleProfileMenu()" id="profileBtn">NG</button>
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+              <strong id="dropdownName">Nishantgiri Goswammi</strong>
+              <span id="dropdownEmail">AR361794</span>
+            </div>
+            <div class="profile-dropdown-item" onclick="navigateTo('profile',null)">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              My Profile
+            </div>
+            <div class="profile-dropdown-item" onclick="navigateTo('subscription',null)">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+              Subscription
+            </div>
+            <div class="profile-dropdown-item danger" onclick="handleLogout()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+              Logout
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== DASHBOARD PAGE ====== -->
+    <div class="page active" id="dashboardPage">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <h1 class="page-title" style="margin:0">My Dashboard</h1>
+        <div class="deploy-select">
+          <span>Strategy Deployed</span>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          <span style="font-size:0.8rem;color:var(--text-muted)">No broker selected</span>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- P&L Card -->
+        <div class="pnl-card">
+          <div class="pnl-label">Total P&L</div>
+          <div class="pnl-amount">₹0</div>
+          <div class="pnl-sub">No trades found yet.</div>
+          <div class="pnl-user" id="dashUserName">Nishantgiri Goswammi</div>
+          <div class="pnl-icon">
+            <svg width="36" height="36" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+        </div>
+
+        <!-- Broker Card -->
+        <div class="broker-card">
+          <div class="card-label">Broker</div>
+          <div class="broker-name">
+            <span style="font-size:1.2rem">🅰️</span>
+            Angel <span style="color:var(--text-muted);font-weight:400;font-size:0.85rem">(N58808026)</span>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="broker-details">
+            <div class="broker-detail-item">
+              <div class="broker-detail-label">Broker Login Status</div>
+              <div class="broker-detail-value status-not-connected">Not Connected</div>
+            </div>
+            <div class="broker-detail-item" style="text-align:right">
+              <div class="broker-detail-label">Static IP</div>
+              <div class="broker-detail-value">Not Assigned</div>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Terminal</div>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div>
+              <div class="toggle-label">Trading Engine</div>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deploy Card -->
+        <div class="deploy-card">
+          <div class="deploy-icon">
+            <svg width="48" height="48" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+          </div>
+          <h3>No Strategies Deployed</h3>
+          <p>You haven't deployed any trading strategies yet.</p>
+          <button class="btn-create" onclick="navigateTo('strategies',null)">Create Strategy</button>
+        </div>
+      </div>
+
+      <!-- Strategy Templates -->
+      <div class="section-header">
+        <span class="section-title">Strategy Templates
+          <svg width="16" height="16" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        </span>
+        <div class="section-controls">
+          <div class="page-controls">
+            <button class="page-btn" onclick="prevTemplatePage()">‹</button>
+            <button class="page-btn active" id="templatePageNum">1</button>
+            <button class="page-btn" onclick="nextTemplatePage()">›</button>
+          </div>
+          <a class="see-all" onclick="navigateTo('strategies',null);setTimeout(()=>switchTab('Strategy Templates'),100)">See All</a>
+        </div>
+      </div>
+      <div class="templates-grid" id="dashTemplatesGrid"></div>
+    </div>
+
+    <!-- ====== BROKER PAGE ====== -->
+    <div class="page" id="brokerPage">
+      <div class="page-header">
+        <div>
+          <h2>Broker</h2>
+          <p>Manage your connected brokers</p>
+        </div>
+        <button class="btn-add-broker" onclick="openModal('addBrokerModal')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          + Add Broker
+        </button>
+      </div>
+      <div class="broker-list-card" id="brokerListCard">
+        <div class="broker-row">
+          <div class="broker-logo">🅰️</div>
+          <div class="broker-info">
+            <strong>Angel</strong>
+            <span>N58808026</span><br>
+            <span>Static IP: Not Assigned</span><br>
+            <span class="not-connected">Not Connected</span>
+          </div>
+          <div style="flex:1"></div>
+          <div class="broker-perf">
+            <span>Strategy Performance</span>
+            <strong>0.00</strong>
+          </div>
+          <div class="broker-toggles">
+            <div class="toggle-item">
+              <span>Terminal</span>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-item">
+              <span>Trading Engine</span>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+          <button class="kebab">⋮</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== STRATEGY BUILDER PAGE ====== -->
+    <div class="page" id="strategyBuilderPage">
+      <h1 class="page-title">Strategy Builder</h1>
+      <div class="builder-layout">
+        <div class="builder-sidebar">
+          <h4>Settings</h4>
+          <div class="builder-field">
+            <label>Instrument</label>
+            <select>
+              <option>NIFTY</option>
+              <option>BANKNIFTY</option>
+              <option>FINNIFTY</option>
+              <option>SENSEX</option>
+              <option>MIDCPNIFTY</option>
+            </select>
+          </div>
+          <div class="builder-field">
+            <label>Exchange</label>
+            <select>
+              <option>NSE</option>
+              <option>BSE</option>
+              <option>NFO</option>
+            </select>
+          </div>
+          <div class="builder-field">
+            <label>Segment</label>
+            <select>
+              <option>Options</option>
+              <option>Futures</option>
+              <option>Equity</option>
+            </select>
+          </div>
+          <div class="builder-field">
+            <label>Expiry</label>
+            <select>
+              <option>Weekly</option>
+              <option>Monthly</option>
+            </select>
+          </div>
+          <div class="builder-field">
+            <label>Product Type</label>
+            <select>
+              <option>MIS</option>
+              <option>NRML</option>
+            </select>
+          </div>
+          <div class="builder-field">
+            <label>Strategy Name</label>
+            <input type="text" placeholder="My Strategy">
+          </div>
+          <button class="btn-primary" style="margin-top:8px" onclick="showToast('Strategy saved!')">Save Strategy</button>
+        </div>
+        <div class="builder-main">
+          <div class="builder-section">
+            <div class="builder-section-title">Entry Conditions</div>
+            <div id="entryConditions">
+              <div class="condition-row">
+                <select><option>Select Indicator</option><option>RSI</option><option>MACD</option><option>EMA</option><option>SMA</option><option>Supertrend</option><option>Bollinger Bands</option></select>
+                <select><option>Crosses Above</option><option>Crosses Below</option><option>Greater Than</option><option>Less Than</option></select>
+                <select><option>Select Value</option><option>30</option><option>50</option><option>70</option><option>Custom</option></select>
+                <button onclick="this.parentElement.remove()" style="padding:6px 10px;border:none;background:#fff0f0;color:var(--danger);border-radius:6px;cursor:pointer">✕</button>
+              </div>
+            </div>
+            <button class="btn-add-condition" onclick="addCondition('entryConditions')">+ Add Entry Condition</button>
+          </div>
+          <div class="builder-section">
+            <div class="builder-section-title">Exit Conditions</div>
+            <div id="exitConditions"></div>
+            <button class="btn-add-condition" onclick="addCondition('exitConditions')">+ Add Exit Condition</button>
+          </div>
+          <div class="builder-section">
+            <div class="builder-section-title">Risk Management</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;flex-wrap:wrap">
+              <div class="builder-field">
+                <label>Stop Loss (%)</label>
+                <input type="number" placeholder="e.g. 1.5">
+              </div>
+              <div class="builder-field">
+                <label>Target Profit (%)</label>
+                <input type="number" placeholder="e.g. 3">
+              </div>
+              <div class="builder-field">
+                <label>Quantity / Lots</label>
+                <input type="number" placeholder="1">
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <button class="btn-primary" onclick="showToast('Running backtest...')">Run Backtest</button>
+            <button onclick="showToast('Strategy deployed!')" style="padding:11px 22px;background:#fff;border:1.5px solid var(--primary);color:var(--primary);border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer">Deploy Live</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== STRATEGIES PAGE ====== -->
+    <div class="page" id="strategiesPage">
+      <div class="tabs">
+        <div class="tab active" onclick="switchStrategyTab('My Strategies',this)">My Strategies</div>
+        <div class="tab" onclick="switchStrategyTab('Deployed Strategies',this)">Deployed Strategies</div>
+        <div class="tab" onclick="switchStrategyTab('Strategy Templates',this)">Strategy Templates</div>
+      </div>
+
+      <!-- My Strategies -->
+      <div id="myStrategiesTab">
+        <div class="strategies-toolbar">
+          <div class="search-box">
+            <svg width="16" height="16" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search strategies...">
+          </div>
+          <div class="toolbar-right">
+            <button class="btn-tab active">Strategies</button>
+            <button class="btn-tab inactive" onclick="showToast('Tradingview Signals feature coming soon')">Tradingview Signals Trading</button>
+          </div>
+        </div>
+        <div id="myStrategiesList">
+          <div class="empty-state">
+            <div class="empty-icon">+</div>
+            <button class="btn-create-lg" onclick="navigateTo('strategyBuilder',null)">+ Create Strategy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deployed Strategies -->
+      <div id="deployedStrategiesTab" class="hidden">
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <p style="color:var(--text-muted)">No deployed strategies yet.</p>
+        </div>
+      </div>
+
+      <!-- Strategy Templates -->
+      <div id="strategyTemplatesTab" class="hidden">
+        <div class="strategy-grid" id="strategyTemplatesGrid"></div>
+      </div>
+    </div>
+
+    <!-- ====== BACKTESTING PAGE ====== -->
+    <div class="page" id="backtestPage">
+      <h1 class="page-title">Strategy Backtest</h1>
+      <div class="coming-soon-card">
+        <div style="font-size:3rem;margin-bottom:16px">📈</div>
+        <h3>Backtest Your Strategies</h3>
+        <p>Create a strategy first, then run backtests to evaluate performance on historical data.</p>
+        <button class="btn-create" style="margin-top:20px" onclick="navigateTo('strategyBuilder',null)">Build a Strategy</button>
+      </div>
+    </div>
+
+    <!-- ====== SIMULATOR PAGE ====== -->
+    <div class="page" id="simulatorPage">
+      <h1 class="page-title">Simulator (Beta)</h1>
+      <!-- Time bar -->
+      <div class="sim-timebar">
+        <select class="sim-symbol-select"><option>NIFTY</option><option>BANKNIFTY</option><option>FINNIFTY</option></select>
+        <button onclick="setTimeBtn(this)">‹‹ Day</button>
+        <button class="active" onclick="setTimeBtn(this)">SOD</button>
+        <button onclick="setTimeBtn(this)">-2h</button>
+        <button onclick="setTimeBtn(this)">-30m</button>
+        <button onclick="setTimeBtn(this)">-15m</button>
+        <button onclick="setTimeBtn(this)">-5m</button>
+        <button onclick="setTimeBtn(this)">-1m</button>
+        <button class="sim-date-btn" onclick="showToast('Date picker')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Tue, Jun 23, 2026
+        </button>
+        <button onclick="setTimeBtn(this)">9</button>
+        <button onclick="setTimeBtn(this)">15</button>
+        <button onclick="setTimeBtn(this)">+1m</button>
+        <button onclick="setTimeBtn(this)">+5m</button>
+        <button onclick="setTimeBtn(this)">+15m</button>
+        <button onclick="setTimeBtn(this)">+30m</button>
+        <button onclick="setTimeBtn(this)">+2h</button>
+        <button onclick="setTimeBtn(this)">EOD</button>
+        <button onclick="setTimeBtn(this)">Day »</button>
+        <button onclick="setTimeBtn(this)" style="background:var(--primary);color:#fff;border-radius:6px;padding:4px 10px">⚡ Stra</button>
+      </div>
+
+      <div class="simulator-container">
+        <!-- Option Chain Panel -->
+        <div class="option-chain-panel">
+          <div class="oc-header">
+            <h3>Option Chain</h3>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+              <button class="oc-date-btn">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                23 Jun 2026
+              </button>
+              <span class="live-badge">Live</span>
+              <button style="background:none;border:none;cursor:pointer;color:var(--text-muted)">⚙️</button>
+            </div>
+          </div>
+          <div class="expiry-tabs">
+            <div class="expiry-tab active">23 JUN 26</div>
+            <div class="expiry-tab">30 JUN 26 (6D)</div>
+            <div class="expiry-tab">07 JUL 26</div>
+            <div class="expiry-tab">14 JUL</div>
+          </div>
+          <div class="oc-symbol-row">
+            <span>Symbol: NIFTY</span>
+            <span>Expiry: 23 JUN 26</span>
+          </div>
+          <div class="oc-body">
+            <table class="oc-table">
+              <thead><tr><th>Call</th><th>Δ</th><th>Strike</th><th>Δ</th></tr></thead>
+              <tbody id="ocTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payoff Panel -->
+        <div class="payoff-panel">
+          <div class="payoff-tabs">
+            <div class="payoff-tab active">Payoff</div>
+            <div class="payoff-tab">Positions</div>
+            <div class="payoff-tab">VWAP+Straddle</div>
+            <div class="payoff-tab">Rolling Straddle</div>
+            <button style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text-muted)">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            </button>
+          </div>
+          <div class="payoff-metrics">
+            <div class="metric-item"><div class="metric-label">EST. MARGIN</div><div class="metric-value">₹0</div></div>
+            <div class="metric-item"><div class="metric-label">P&L</div><div class="metric-value">₹0 (0%)</div></div>
+            <div class="metric-item"><div class="metric-label">MAX PROFIT</div><div class="metric-value">-</div></div>
+            <div class="metric-item"><div class="metric-label">MAX LOSS</div><div class="metric-value">-</div></div>
+            <div class="metric-item"><div class="metric-label">POP</div><div class="metric-value">-</div></div>
+            <div class="metric-item"><div class="metric-label">NET PREMIUM</div><div class="metric-value">₹0</div></div>
+          </div>
+          <div class="payoff-empty">
+            <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 9 9 9 21"/><polyline points="9 9 15 15 21 9"/></svg>
+            <p style="margin-top:8px">No positions added</p>
+            <p style="font-size:0.8rem;color:var(--text-muted)">Select strikes from Option Chain to visualize payoff</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== REPORTS PAGE ====== -->
+    <div class="page" id="reportsPage">
+      <div class="tabs">
+        <div class="tab active">Report</div>
+        <div class="tab" onclick="showToast('Trade Engine Logs coming soon')">Trade Engine Logs</div>
+      </div>
+      <div class="report-header">
+        <div class="date-input">
+          <span>From</span>
+          <input type="date" value="2025-06-24">
+        </div>
+        <div class="date-input">
+          <span>To</span>
+          <input type="date" value="2026-06-24">
+        </div>
+        <div class="date-input">
+          <span>Select Broker</span>
+          <select class="broker-select"><option>All</option><option>Angel</option></select>
+        </div>
+        <div class="report-toggle-group">
+          <button class="report-toggle active">Live</button>
+          <button class="report-toggle">Forward</button>
+        </div>
+        <button class="btn-get-reports" onclick="showToast('Fetching reports...')">Get Reports</button>
+      </div>
+      <div class="report-grid">
+        <div class="report-card">
+          <h4>Strategy Breakdown</h4>
+          <div style="display:flex;align-items:center;gap:20px">
+            <div class="piechart-empty">
+              <span>Total P&L</span>
+              <strong>0</strong>
+            </div>
+            <div class="no-data">No data</div>
+          </div>
+        </div>
+        <div class="report-card">
+          <div class="no-data">No data</div>
+        </div>
+      </div>
+      <div class="no-strategies">No strategies found.</div>
+    </div>
+
+    <!-- ====== SUBSCRIPTION PAGE ====== -->
+    <div class="page" id="subscriptionPage">
+      <h1 class="page-title">Subscriptions</h1>
+      <div class="sub-tabs tabs">
+        <div class="tab active">Plans</div>
+      </div>
+      <div class="billing-toggle">
+        <button class="billing-btn" onclick="setBilling('Monthly',this)">Monthly</button>
+        <button class="billing-btn active" onclick="setBilling('Quarterly',this)">Quarterly</button>
+        <button class="billing-btn" onclick="setBilling('Yearly',this)">Yearly</button>
+      </div>
+      <div class="plans-grid" id="plansGrid"></div>
+    </div>
+
+    <!-- ====== PROFILE PAGE ====== -->
+    <div class="page" id="profilePage">
+      <h1 class="page-title">My Profile</h1>
+      <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:600px">
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:28px">
+          <div class="user-avatar" style="width:64px;height:64px;font-size:1.4rem" id="profileAvatar">NG</div>
+          <div>
+            <h3 id="profileName" style="font-size:1.1rem;font-weight:700">Nishantgiri Goswammi</h3>
+            <p id="profileId" style="color:var(--text-muted);font-size:0.85rem">AR361794</p>
+          </div>
+        </div>
+        <div class="builder-field"><label>Full Name</label><input type="text" id="profileNameInput" value="Nishantgiri Goswammi"></div>
+        <div class="builder-field"><label>Email</label><input type="email" id="profileEmailInput" value="nishantgiri@example.com"></div>
+        <div class="builder-field"><label>Phone</label><input type="tel" id="profilePhoneInput" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="builder-field"><label>Client ID</label><input type="text" value="AR361794" readonly style="background:#f3f4f6"></div>
+        <button class="btn-primary" style="width:auto;padding:10px 28px" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+</div><!-- end app-layout -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== STATE ====================
+const state = {
+  user: {
+    name: 'Nishantgiri Goswammi',
+    id: 'AR361794',
+    email: 'nishantgiri@example.com',
+    initials: 'NG'
+  },
+  sidebarCollapsed: false,
+  currentBilling: 'Quarterly',
+  strategyTemplates: [
+    {
+      name: 'Brahmastra Nifty Selling',
+      desc: 'A trend-following Nifty option selling strategy using Moving Average MACD and Supertrend. It enters short positions when all indicators align bearishly.',
+      type: 'Options'
+    },
+    {
+      name: 'Golden Crossover Nifty Selling',
+      desc: 'A trend-based Nifty selling strategy using Moving Averages to execute short ITM call or put positions. It aims to capture strong downtrends.',
+      type: 'Options'
+    },
+    {
+      name: '1% Strangle Nifty',
+      desc: 'A Nifty 50 intraday short strangle selling weekly ITM options to capture Theta. It employs a 1% stop-loss on each leg.',
+      type: 'Options'
+    },
+    {
+      name: 'Iron Condor BankNifty',
+      desc: 'A premium collection strategy on BankNifty using Iron Condor structure. Best suited for low-volatility sideways markets.',
+      type: 'Options'
+    },
+    {
+      name: 'Supertrend Momentum',
+      desc: 'Rides strong momentum using Supertrend indicator on 15-minute charts. Enters long or short based on Supertrend crossover signals.',
+      type: 'Options'
+    },
+    {
+      name: 'FinNifty Weekly Straddle',
+      desc: 'Sells ATM straddle on FinNifty every Monday morning and manages positions with predefined SL and target levels.',
+      type: 'Options'
+    }
+  ],
+  myStrategies: [],
+  brokers: [{ name: 'Angel', id: 'N58808026', connected: false }],
+  selectedBrokerName: '',
+  templatePage: 0
+};
+
+const PLANS = {
+  Monthly: [
+    { name: 'Free Plan', price: '₹0', gst: '', active: true, features: ['50 allowed backtest credits','5 strategy creation allowed','0 live + forward deployments allowed','0 strategy portfolio allowed','Max Brokers allowed: 1','Brokers allowed: All'] },
+    { name: 'Unlimited Plan', price: '₹2491', gst: '(+ GST)', active: false, features: ['1500 allowed backtest credits','50 strategy creation allowed','20 live + forward deployments allowed','10 strategy portfolio allowed','Unlimited Brokers'] },
+    { name: 'Limited Plan', price: '₹1491', gst: '(+ GST)', active: false, features: ['500 allowed backtest credits','25 strategy creation allowed','5 live + forward deployments allowed','2 strategy portfolio allowed','Max 3 Brokers'] }
+  ],
+  Quarterly: [
+    { name: 'Free Plan', price: '₹0', gst: '', active: true, features: ['50 allowed backtest credits','5 strategy creation allowed','0 live + forward deployments allowed','0 strategy portfolio allowed','Max Brokers allowed: 1','Brokers allowed: All'] },
+    { name: 'Unlimited Plan', price: '₹6373', gst: '(+ GST)', active: false, features: ['1500 allowed backtest credits','50 strategy creation allowed','20 live + forward deployments allowed','10 strategy portfolio allowed','Unlimited Brokers'] },
+    { name: 'Limited Plan', price: '₹3823', gst: '(+ GST)', active: false, features: ['500 allowed backtest credits','25 strategy creation allowed','5 live + forward deployments allowed','2 strategy portfolio allowed','Max 3 Brokers'] }
+  ],
+  Yearly: [
+    { name: 'Free Plan', price: '₹0', gst: '', active: true, features: ['50 allowed backtest credits','5 strategy creation allowed','0 live + forward deployments allowed','0 strategy portfolio allowed','Max Brokers allowed: 1','Brokers allowed: All'] },
+    { name: 'Unlimited Plan', price: '₹21,999', gst: '(+ GST)', active: false, features: ['1500 allowed backtest credits','50 strategy creation allowed','20 live + forward deployments allowed','10 strategy portfolio allowed','Unlimited Brokers'] },
+    { name: 'Limited Plan', price: '₹12,999', gst: '(+ GST)', active: false, features: ['500 allowed backtest credits','25 strategy creation allowed','5 live + forward deployments allowed','2 strategy portfolio allowed','Max 3 Brokers'] }
+  ]
+};
+
+const OPTION_CHAIN_DATA = [
+  { call: 766.90, delta: 1.00, strike: 23300, putDelta: -0.006722 },
+  { call: 720.00, delta: 1.00, strike: 23350, putDelta: -0.007100 },
+  { call: 681.05, delta: 0.96, strike: 23400, putDelta: -0.007528 },
+  { call: 649.15, delta: 0.90, strike: 23450, putDelta: -0.007086 },
+  { call: 589.95, delta: 0.92, strike: 23500, putDelta: -0.009058 },
+  { call: 519.50, delta: 1.00, strike: 23550, putDelta: -0.009746 },
+  { call: 469.60, delta: 1.00, strike: 23600, putDelta: -0.01 },
+  { call: 436.10, delta: 0.91, strike: 23650, putDelta: -0.02 },
+  { call: 398.40, delta: 0.88, strike: 23700, putDelta: -0.03 },
+  { call: 355.20, delta: 0.82, strike: 23750, putDelta: -0.05 },
+  { call: 310.00, delta: 0.75, strike: 23800, putDelta: -0.08 },
+  { call: 265.50, delta: 0.68, strike: 23850, putDelta: -0.12 },
+  { call: 220.30, delta: 0.58, strike: 23900, putDelta: -0.18 },
+  { call: 178.60, delta: 0.48, strike: 23950, putDelta: -0.25 },
+  { call: 140.20, delta: 0.38, strike: 24000, putDelta: -0.35 },
+];
+
+// ==================== INIT ====================
+function init() {
+  renderOptionChain();
+  renderDashTemplates();
+  renderStrategyTemplates();
+}
+
+// ==================== AUTH FUNCTIONS ====================
+function showPage(pageId) {
+  document.querySelectorAll('.auth-page,.modal-overlay').forEach(el => el.classList.add('hidden'));
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById(pageId).classList.remove('hidden');
+}
+
+function togglePw(id, btn) {
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function handleGoogleLogin() {
+  showToast('Redirecting to Google...');
+  setTimeout(() => completeLogin('Google User', 'GU' + Math.floor(Math.random()*100000)), 1000);
+}
+
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const pw = document.getElementById('loginPassword').value;
+  if (!email || !pw) { showToast('Please fill all fields'); return; }
+  completeLogin(state.user.name, state.user.id);
+}
+
+function handleRegister() {
+  const name = document.getElementById('regName').value;
+  const email = document.getElementById('regEmail').value;
+  const pw = document.getElementById('regPassword').value;
+  const confirm = document.getElementById('regConfirm').value;
+  if (!name || !email || !pw) { showToast('Please fill all fields'); return; }
+  if (pw !== confirm) { showToast('Passwords do not match'); return; }
+  completeLogin(name, 'AR' + Math.floor(Math.random()*999999));
+}
+
+function handleForgot() {
+  const email = document.getElementById('forgotEmail').value;
+  if (!email) { showToast('Enter your email address'); return; }
+  showToast('Reset link sent to ' + email);
+  setTimeout(() => showPage('signInPage'), 1500);
+}
+
+function completeLogin(name, id) {
+  state.user.name = name;
+  state.user.id = id;
+  state.user.initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  updateUserUI();
+  document.querySelectorAll('.auth-page').forEach(el => el.classList.add('hidden'));
+  document.getElementById('disclaimerModal').classList.remove('hidden');
+}
+
+function acceptDisclaimer() {
+  const cb = document.getElementById('acceptTerms');
+  if (!cb.checked) { showToast('Please accept the Terms & Conditions'); return; }
+  document.getElementById('disclaimerModal').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  init();
+}
+
+function handleLogout() {
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById('profileDropdown').classList.remove('open');
+  showPage('signInPage');
+}
+
+// ==================== USER UI ====================
+function updateUserUI() {
+  const {name, id, initials} = state.user;
+  document.getElementById('sidebarUserName').textContent = name;
+  document.getElementById('sidebarUserId').textContent = id;
+  document.getElementById('sidebarAvatar').textContent = initials;
+  document.getElementById('profileBtn').textContent = initials;
+  document.getElementById('dropdownName').textContent = name;
+  document.getElementById('dropdownEmail').textContent = id;
+  document.getElementById('dashUserName').textContent = name;
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('profileId').textContent = id;
+  document.getElementById('profileAvatar').textContent = initials;
+  document.getElementById('profileNameInput').value = name;
+}
+
+function saveProfile() {
+  state.user.name = document.getElementById('profileNameInput').value;
+  state.user.email = document.getElementById('profileEmailInput').value;
+  state.user.initials = state.user.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  updateUserUI();
+  showToast('Profile saved!');
+}
+
+// ==================== NAVIGATION ====================
+function navigateTo(page, navEl) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  const pageMap = {
+    dashboard: 'dashboardPage',
+    broker: 'brokerPage',
+    strategyBuilder: 'strategyBuilderPage',
+    strategies: 'strategiesPage',
+    backtest: 'backtestPage',
+    simulator: 'simulatorPage',
+    reports: 'reportsPage',
+    subscription: 'subscriptionPage',
+    profile: 'profilePage'
+  };
+
+  const pageEl = document.getElementById(pageMap[page]);
+  if (pageEl) pageEl.classList.add('active');
+  if (navEl) navEl.classList.add('active');
+
+  // Special inits
+  if (page === 'subscription') renderPlans();
+  if (page === 'strategies') renderStrategyTemplates();
+
+  // Close mobile sidebar
+  closeMobileSidebar();
+  document.getElementById('profileDropdown').classList.remove('open');
+
+  window.scrollTo(0, 0);
+}
+
+function toggleBacktestMenu(el) {
+  const sub = document.getElementById('backtestSubmenu');
+  sub.classList.toggle('open');
+  el.querySelector('.nav-chevron').style.transform = sub.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+// ==================== SIDEBAR ====================
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('mainContent');
+  state.sidebarCollapsed = !state.sidebarCollapsed;
+  sidebar.classList.toggle('collapsed', state.sidebarCollapsed);
+  main.classList.toggle('expanded', state.sidebarCollapsed);
+}
+
+function toggleMobileSidebar() {
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ==================== PROFILE MENU ====================
+function toggleProfileMenu() {
+  document.getElementById('profileDropdown').classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.profile-menu')) {
+    document.getElementById('profileDropdown').classList.remove('open');
+  }
+});
+
+// ==================== MODALS ====================
+function openModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+// ==================== STRATEGY TEMPLATES ====================
+function renderDashTemplates() {
+  const grid = document.getElementById('dashTemplatesGrid');
+  const perPage = 3;
+  const start = state.templatePage * perPage;
+  const templates = state.strategyTemplates.slice(start, start + perPage);
+  grid.innerHTML = templates.map((t, i) => `
+    <div class="template-card">
+      <h4>${t.name}</h4>
+      <p>${t.desc.slice(0, 110)}...</p>
+      <span class="read-more" onclick="showToast('Full description: ${t.name}')">Read more</span>
+      <button class="btn-add" onclick="addToMyStrategy('${t.name}', '${t.type}', '${t.desc.slice(0,80)}')">Add to my strategy</button>
+    </div>
+  `).join('');
+  document.getElementById('templatePageNum').textContent = state.templatePage + 1;
+}
+
+function prevTemplatePage() {
+  if (state.templatePage > 0) { state.templatePage--; renderDashTemplates(); }
+}
+
+function nextTemplatePage() {
+  const maxPage = Math.ceil(state.strategyTemplates.length / 3) - 1;
+  if (state.templatePage < maxPage) { state.templatePage++; renderDashTemplates(); }
+}
+
+function renderStrategyTemplates() {
+  const grid = document.getElementById('strategyTemplatesGrid');
+  if (!grid) return;
+  grid.innerHTML = state.strategyTemplates.map(t => `
+    <div class="strategy-card">
+      <div class="strategy-card-header">
+        <h4>${t.name}</h4>
+        <span class="strategy-badge badge-options">${t.type}</span>
+      </div>
+      <p>${t.desc}</p>
+      <div class="strategy-card-footer">
+        <button class="btn-sm primary" onclick="addToMyStrategy('${t.name}', '${t.type}', '${t.desc.slice(0,80)}')">Add to Strategy</button>
+        <button class="btn-sm outline" onclick="showToast('Backtesting: ${t.name}')">Backtest</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addToMyStrategy(name, type, desc) {
+  if (state.myStrategies.find(s => s.name === name)) {
+    showToast(name + ' already in My Strategies'); return;
+  }
+  state.myStrategies.push({ name, type, desc });
+  renderMyStrategies();
+  showToast(name + ' added to My Strategies!');
+}
+
+function renderMyStrategies() {
+  const el = document.getElementById('myStrategiesList');
+  if (!el) return;
+  if (state.myStrategies.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">+</div><button class="btn-create-lg" onclick="navigateTo('strategyBuilder',null)">+ Create Strategy</button></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="strategy-grid">${state.myStrategies.map((s,i) => `
+    <div class="strategy-card">
+      <div class="strategy-card-header">
+        <h4>${s.name}</h4>
+        <span class="strategy-badge badge-options">${s.type}</span>
+      </div>
+      <p>${s.desc}...</p>
+      <div class="strategy-card-footer">
+        <button class="btn-sm primary" onclick="showToast('Deploying: ${s.name}')">Deploy</button>
+        <button class="btn-sm outline" onclick="showToast('Backtesting: ${s.name}')">Backtest</button>
+      </div>
+    </div>
+  `).join('')}</div>`;
+}
+
+// ==================== STRATEGY TABS ====================
+function switchStrategyTab(tab, el) {
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('myStrategiesTab').classList.add('hidden');
+  document.getElementById('deployedStrategiesTab').classList.add('hidden');
+  document.getElementById('strategyTemplatesTab').classList.add('hidden');
+
+  if (tab === 'My Strategies') {
+    document.getElementById('myStrategiesTab').classList.remove('hidden');
+    renderMyStrategies();
+  } else if (tab === 'Deployed Strategies') {
+    document.getElementById('deployedStrategiesTab').classList.remove('hidden');
+  } else {
+    document.getElementById('strategyTemplatesTab').classList.remove('hidden');
+    renderStrategyTemplates();
+  }
+}
+
+function switchTab(tab) { switchStrategyTab(tab, null); }
+
+// ==================== SUBSCRIPTIONS ====================
+function setBilling(plan, btn) {
+  state.currentBilling = plan;
+  document.querySelectorAll('.billing-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPlans();
+}
+
+function renderPlans() {
+  const grid = document.getElementById('plansGrid');
+  if (!grid) return;
+  const plans = PLANS[state.currentBilling];
+  grid.innerHTML = plans.map((p, i) => `
+    <div class="plan-card ${i===1?'featured':''}">
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price">${p.price} <span>${p.gst}</span></div>
+      ${p.active
+        ? '<div class="plan-active">Plan already active</div>'
+        : `<button class="btn-get-started" onclick="showToast('Redirecting to payment for ${p.name}...')">Get Started</button>`
+      }
+      <div class="plan-features">
+        <h5>What's included:</h5>
+        <ul>${p.features.map(f => `<li ${f.startsWith('0 live') ? 'class="warn"' : ''}>${f}</li>`).join('')}</ul>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==================== BROKER ====================
+function selectBroker(el, name) {
+  document.querySelectorAll('.broker-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedBrokerName = name;
+}
+
+function saveBroker() {
+  const clientId = document.getElementById('brokerClientId').value;
+  if (!state.selectedBrokerName) { showToast('Select a broker'); return; }
+  if (!clientId) { showToast('Enter Client ID / API Key'); return; }
+  closeModal('addBrokerModal');
+  showToast(state.selectedBrokerName + ' broker connected!');
+  // Add to broker list
+  const card = document.getElementById('brokerListCard');
+  const row = document.createElement('div');
+  row.className = 'broker-row';
+  row.innerHTML = `
+    <div class="broker-logo">🔵</div>
+    <div class="broker-info">
+      <strong>${state.selectedBrokerName}</strong>
+      <span>${clientId}</span><br>
+      <span>Static IP: Not Assigned</span><br>
+      <span style="color:var(--success)">Connected</span>
+    </div>
+    <div style="flex:1"></div>
+    <div class="broker-perf"><span>Strategy Performance</span><strong>0.00</strong></div>
+    <div class="broker-toggles">
+      <div class="toggle-item"><span>Terminal</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+      <div class="toggle-item"><span>Trading Engine</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    </div>
+    <button class="kebab" onclick="this.closest('.broker-row').remove();showToast('Broker removed')">⋮</button>
+  `;
+  card.appendChild(row);
+  document.getElementById('brokerClientId').value = '';
+  document.getElementById('brokerSecret').value = '';
+}
+
+// ==================== SIMULATOR ====================
+function renderOptionChain() {
+  const tbody = document.getElementById('ocTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = OPTION_CHAIN_DATA.map(row => `
+    <tr>
+      <td>
+        <button class="btn-bs btn-b" onclick="addPosition(${row.strike},'CE','B')">B</button>
+        <button class="btn-bs btn-s" onclick="addPosition(${row.strike},'CE','S')">S</button>
+        ${row.call.toFixed(2)}
+      </td>
+      <td>${row.delta.toFixed(2)}</td>
+      <td class="oc-strike">${row.strike}</td>
+      <td>${row.putDelta.toFixed(6)}</td>
+    </tr>
+  `).join('');
+}
+
+function addPosition(strike, type, action) {
+  showToast(`${action === 'B' ? 'Bought' : 'Sold'} ${strike} ${type}`);
+}
+
+function setTimeBtn(el) {
+  el.closest('.sim-timebar').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ==================== STRATEGY BUILDER ====================
+function addCondition(containerId) {
+  const container = document.getElementById(containerId);
+  const row = document.createElement('div');
+  row.className = 'condition-row';
+  row.innerHTML = `
+    <select><option>Select Indicator</option><option>RSI</option><option>MACD</option><option>EMA</option><option>SMA</option><option>Supertrend</option><option>Bollinger Bands</option><option>ATR</option><option>VWAP</option></select>
+    <select><option>Crosses Above</option><option>Crosses Below</option><option>Greater Than</option><option>Less Than</option><option>Equals</option></select>
+    <select><option>Select Value</option><option>20</option><option>30</option><option>50</option><option>70</option><option>80</option><option>Custom</option></select>
+    <button onclick="this.parentElement.remove()" style="padding:6px 10px;border:none;background:#fff0f0;color:var(--danger);border-radius:6px;cursor:pointer">✕</button>
+  `;
+  container.appendChild(row);
+}
+
+// ==================== TOAST ====================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ==================== CLOSE MODALS ON OVERLAY CLICK ====================
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this && this.id !== 'disclaimerModal') closeModal(this.id);
+  });
+});
+</script>
+</body>
+</html>
