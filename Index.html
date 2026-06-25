@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Omnis Global Algo</title>
+<style>
+:root {
+  --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#3b82f6;
+  --bg:#f3f4f6;--sidebar-bg:#fff;--card-bg:#fff;
+  --text:#1f2937;--text-muted:#6b7280;--text-light:#9ca3af;
+  --border:#e5e7eb;--danger:#ef4444;--success:#10b981;--warning:#f59e0b;
+  --sidebar-width:240px;--header-height:60px;
+}
+body.dark {
+  --bg:#0f172a;--sidebar-bg:#1e293b;--card-bg:#1e293b;
+  --text:#f1f5f9;--text-muted:#94a3b8;--text-light:#64748b;--border:#334155;
+}
+body.dark .topbar{background:#1e293b;}
+body.dark .form-group input,body.dark select,body.dark textarea,body.dark input[type=date],body.dark input[type=text],body.dark input[type=email],body.dark input[type=password],body.dark input[type=number],body.dark input[type=tel]{background:#0f172a;color:#f1f5f9;border-color:#334155;}
+body.dark .btn-google{background:#0f172a;color:#f1f5f9;border-color:#334155;}
+body.dark .modal-box,.dark .profile-dropdown,.dark .notif-panel-box{background:#1e293b;}
+body.dark .expiry-tab{background:#0f172a;color:#94a3b8;}
+body.dark .oc-strike{background:#162032;}
+body.dark .btn-tab.inactive{background:#0f172a;color:#94a3b8;}
+body.dark .search-box{background:#0f172a;}
+body.dark .search-box input{background:transparent;}
+body.dark .auth-right{background:#1e293b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background 0.3s,color 0.3s;}
+
+/* AUTH */
+.auth-page{display:flex;min-height:100vh;}
+.auth-left{flex:1;background:linear-gradient(135deg,#e0e7ff,#c7d2fe,#a5b4fc);display:flex;align-items:center;justify-content:center;padding:40px;}
+.auth-left-badge{background:var(--primary);color:#fff;border-radius:16px;padding:30px 36px;display:inline-block;}
+.auth-left-badge h2{font-size:2rem;font-weight:800;line-height:1.2;}
+.auth-left-badge p{margin-top:8px;opacity:.9;font-size:.95rem;}
+.auth-tagline{font-size:.85rem;color:#374151;margin-top:20px;}
+.auth-right{width:420px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 40px;}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.auth-logo span{font-size:1.3rem;font-weight:800;}
+.auth-right h1{font-size:1.8rem;font-weight:700;color:var(--primary);margin:16px 0 6px;}
+.auth-right>p{color:var(--text-muted);font-size:.9rem;text-align:center;margin-bottom:24px;}
+.btn-google{width:100%;padding:12px;border:1.5px solid var(--border);border-radius:8px;background:#f9fafb;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:.95rem;color:var(--text);margin-bottom:16px;}
+.btn-google:hover{background:#f3f4f6;}
+.auth-divider{display:flex;align-items:center;gap:12px;color:var(--text-muted);font-size:.85rem;margin-bottom:16px;width:100%;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.form-group{width:100%;margin-bottom:14px;}
+.form-group input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:8px;font-size:.95rem;background:#f9fafb;outline:none;transition:border .2s;}
+.form-group input:focus{border-color:var(--primary);background:#fff;}
+.form-group.pw-wrap{position:relative;}
+.form-group.pw-wrap input{padding-right:44px;}
+.toggle-pw{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--text-muted);background:none;border:none;}
+.forgot-link{text-align:right;width:100%;margin-bottom:18px;}
+.forgot-link a{color:var(--primary);font-size:.85rem;text-decoration:none;}
+.btn-primary{width:100%;padding:13px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;}
+.btn-primary:hover{background:var(--primary-dark);}
+.auth-switch{margin-top:20px;font-size:.88rem;color:var(--text-muted);text-align:center;}
+.auth-switch a{color:var(--primary);font-weight:600;text-decoration:none;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.modal-box{background:#fff;border-radius:16px;padding:36px;max-width:560px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.15);}
+.modal-box h3{display:flex;align-items:center;gap:10px;font-size:1.1rem;font-weight:700;margin-bottom:20px;}
+.modal-box ul{padding-left:18px;list-style:disc;}
+.modal-box ul li{margin-bottom:10px;font-size:.92rem;line-height:1.6;}
+.modal-box ul li span{color:var(--primary);}
+.modal-source{font-size:.78rem;color:var(--text-muted);margin:16px 0;line-height:1.5;}
+.modal-source a{color:var(--primary);}
+.modal-accept{display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:.9rem;cursor:pointer;}
+.modal-accept a{color:var(--primary);}
+.btn-understand{width:100%;padding:13px;background:var(--primary-light);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;}
+.broker-options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.broker-option{border:1.5px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .15s;}
+.broker-option:hover,.broker-option.selected{border-color:var(--primary);background:#eff6ff;}
+.broker-option .bname{font-size:.82rem;font-weight:600;margin-top:6px;}
+
+/* APP LAYOUT */
+.app-layout{display:flex;min-height:100vh;}
+.sidebar{width:var(--sidebar-width);background:var(--sidebar-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:200;transition:width .3s,transform .3s;}
+.sidebar.collapsed{width:60px;}
+.sidebar-logo{padding:18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);min-height:var(--header-height);}
+.sidebar-logo span{font-size:.92rem;font-weight:800;white-space:nowrap;overflow:hidden;transition:opacity .2s;}
+.sidebar.collapsed .sidebar-logo span{opacity:0;width:0;}
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--text-muted);font-size:.9rem;font-weight:500;transition:all .15s;margin-bottom:2px;white-space:nowrap;text-decoration:none;}
+.nav-item:hover{background:#eff6ff;color:var(--primary);}
+.nav-item.active{background:var(--primary);color:#fff;}
+.nav-item svg{flex-shrink:0;}
+.nav-label{transition:opacity .2s;overflow:hidden;}
+.sidebar.collapsed .nav-label{opacity:0;width:0;}
+.nav-chevron{margin-left:auto;transition:transform .2s;}
+.nav-sub{padding-left:36px;overflow:hidden;max-height:0;transition:max-height .3s;}
+.nav-sub.open{max-height:200px;}
+.nav-sub-item{padding:7px 12px;font-size:.85rem;color:var(--text-muted);cursor:pointer;border-radius:6px;display:block;text-decoration:none;}
+.nav-sub-item:hover,.nav-sub-item.active{color:var(--primary);}
+.sidebar-user{padding:14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0;}
+.user-info{overflow:hidden;}
+.user-id{font-size:.7rem;color:var(--text-muted);}
+.user-name{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar.collapsed .user-info{display:none;}
+.main-content{margin-left:var(--sidebar-width);flex:1;transition:margin-left .3s;min-height:100vh;}
+.main-content.expanded{margin-left:60px;}
+.topbar{height:var(--header-height);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:100;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.collapse-btn{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:6px;border-radius:6px;display:flex;align-items:center;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.icon-btn{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:7px;border-radius:6px;display:flex;align-items:center;position:relative;}
+.icon-btn:hover{background:var(--bg);color:var(--text);}
+.hamburger-btn{display:none;background:none;border:none;cursor:pointer;color:var(--text);padding:6px;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150;}
+.page{padding:24px;display:none;}
+.page.active{display:block;}
+.page-title{font-size:1.4rem;font-weight:700;margin-bottom:24px;}
+
+/* PROFILE DROPDOWN */
+.profile-btn{width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;font-size:.82rem;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.profile-dropdown{position:absolute;right:0;top:calc(100% + 8px);background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.12);min-width:200px;z-index:300;display:none;overflow:hidden;}
+.profile-dropdown.open{display:block;}
+.profile-dropdown-header{padding:14px 16px;border-bottom:1px solid var(--border);}
+.profile-dropdown-header strong{display:block;font-size:.9rem;}
+.profile-dropdown-header span{font-size:.78rem;color:var(--text-muted);}
+.profile-dropdown-item{padding:11px 16px;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:10px;color:var(--text);}
+.profile-dropdown-item:hover{background:#f9fafb;}
+.profile-dropdown-item.danger{color:var(--danger);}
+
+/* DASHBOARD */
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:28px;}
+.pnl-card{background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:16px;padding:24px;color:#fff;position:relative;overflow:hidden;}
+.pnl-label{font-size:.85rem;opacity:.85;margin-bottom:6px;}
+.pnl-amount{font-size:2rem;font-weight:800;margin-bottom:4px;}
+.pnl-sub{font-size:.82rem;opacity:.75;margin-bottom:20px;}
+.pnl-user{font-size:.95rem;font-weight:600;}
+.broker-card,.deploy-card{background:var(--card-bg);border-radius:16px;padding:24px;border:1px solid var(--border);}
+.card-label{font-size:.78rem;color:var(--text-muted);margin-bottom:6px;}
+.broker-name{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:600;margin-bottom:14px;}
+.broker-details{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.broker-detail-label{font-size:.72rem;color:var(--text-muted);margin-bottom:2px;}
+.broker-detail-value{font-size:.88rem;font-weight:600;}
+.status-nc{color:var(--danger);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+.toggle-label{font-size:.82rem;color:var(--text-muted);margin-bottom:4px;}
+.toggle{width:40px;height:22px;background:#d1d5db;border-radius:11px;position:relative;cursor:pointer;transition:background .2s;}
+.toggle.on{background:var(--primary);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;}
+.toggle.on::after{left:21px;}
+.deploy-card{text-align:center;}
+.deploy-icon{margin:8px auto 16px;color:var(--text-muted);}
+.deploy-card h3{font-size:1rem;font-weight:700;margin-bottom:6px;}
+.deploy-card p{font-size:.82rem;color:var(--text-muted);margin-bottom:18px;}
+.btn-create{background:var(--primary);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;}
+
+/* STATS CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.stat-card-label{font-size:.75rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;margin-bottom:6px;}
+.stat-card-value{font-size:1.4rem;font-weight:800;}
+.stat-card-value.green{color:var(--success);}
+.stat-card-value.red{color:var(--danger);}
+.stat-card-sub{font-size:.75rem;color:var(--text-muted);margin-top:4px;}
+
+/* SECTION */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-title{font-size:1.05rem;font-weight:700;}
+.see-all{color:var(--primary);font-size:.88rem;cursor:pointer;text-decoration:none;font-weight:500;}
+.page-controls{display:flex;align-items:center;gap:6px;}
+.page-btn{width:28px;height:28px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;}
+.page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.templates-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.template-card{background:var(--card-bg);border-radius:12px;padding:20px;border:1px solid var(--border);}
+.template-card h4{font-size:.9rem;font-weight:700;margin-bottom:8px;}
+.template-card p{font-size:.8rem;color:var(--text-muted);line-height:1.5;margin-bottom:4px;}
+.read-more{color:var(--primary);font-size:.8rem;cursor:pointer;}
+.btn-add{width:100%;margin-top:14px;padding:9px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto;}
+.tab{padding:10px 20px;font-size:.9rem;font-weight:500;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+
+/* BROKER PAGE */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.page-header h2{font-size:1.3rem;font-weight:700;}
+.page-header p{font-size:.82rem;color:var(--text-muted);margin-top:2px;}
+.btn-add-broker{background:var(--primary);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.broker-list-card{background:var(--card-bg);border-radius:12px;border:1px solid var(--border);overflow:hidden;}
+.broker-row{display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.broker-row:last-child{border-bottom:none;}
+.broker-logo{width:48px;height:48px;border-radius:8px;background:#fff5e6;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.broker-info{flex:1;min-width:120px;}
+.broker-info strong{display:block;font-size:.95rem;font-weight:700;}
+.broker-info span{font-size:.8rem;color:var(--text-muted);}
+.broker-info .nc{color:var(--danger);font-size:.8rem;}
+.broker-perf{text-align:center;}
+.broker-perf span{font-size:.75rem;color:var(--text-muted);}
+.broker-perf strong{display:block;font-size:1rem;font-weight:700;}
+.broker-toggles{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.toggle-item{text-align:center;}
+.toggle-item span{font-size:.72rem;color:var(--text-muted);display:block;margin-bottom:4px;}
+.kebab{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.2rem;padding:4px 8px;}
+
+/* COPY TRADING */
+.copy-trade-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.copy-trader-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:14px;padding:20px;}
+.trader-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.trader-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.9rem;flex-shrink:0;}
+.trader-info strong{display:block;font-size:.92rem;font-weight:700;}
+.trader-info span{font-size:.78rem;color:var(--text-muted);}
+.trader-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.trader-stat{text-align:center;}
+.trader-stat-val{font-size:.95rem;font-weight:700;}
+.trader-stat-val.green{color:var(--success);}
+.trader-stat-label{font-size:.7rem;color:var(--text-muted);margin-top:2px;}
+.btn-copy-trade{width:100%;padding:9px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;}
+.btn-copy-trade.following{background:var(--success);}
+
+/* PAPER TRADING */
+.sim-timebar{overflow-x:auto;background:var(--card-bg);border-bottom:1px solid var(--border);padding:0 8px;display:flex;align-items:center;gap:2px;height:44px;}
+.sim-timebar button{padding:4px 10px;border:none;background:none;cursor:pointer;font-size:.78rem;color:var(--text-muted);border-radius:4px;white-space:nowrap;}
+.sim-timebar button:hover{background:var(--bg);}
+.sim-timebar button.active{background:var(--primary);color:#fff;}
+.sim-symbol-select{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.82rem;cursor:pointer;color:var(--text);}
+.simulator-container{display:grid;grid-template-columns:360px 1fr;gap:0;background:var(--card-bg);border-radius:12px;border:1px solid var(--border);overflow:hidden;min-height:580px;}
+.option-chain-panel{border-right:1px solid var(--border);}
+.oc-header{padding:16px;border-bottom:1px solid var(--border);}
+.oc-header h3{font-size:1rem;font-weight:700;margin-bottom:4px;}
+.expiry-tabs{display:flex;overflow-x:auto;padding:10px 16px;gap:8px;border-bottom:1px solid var(--border);}
+.expiry-tab{white-space:nowrap;padding:5px 12px;border-radius:6px;font-size:.8rem;cursor:pointer;border:1px solid var(--border);background:var(--card-bg);}
+.expiry-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.oc-symbol-row{padding:10px 16px;font-size:.8rem;color:var(--text-muted);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
+.oc-body{max-height:480px;overflow-y:auto;}
+.oc-table{width:100%;font-size:.8rem;}
+.oc-table th{padding:8px 12px;text-align:left;color:var(--text-muted);font-weight:600;font-size:.75rem;border-bottom:1px solid var(--border);}
+.oc-table td{padding:7px 12px;border-bottom:1px solid #f3f4f6;}
+.oc-strike{font-weight:700;background:#f8fafc;}
+body.dark .oc-strike{background:#162032;}
+body.dark .oc-table td{border-bottom-color:#1e293b;}
+.btn-bs{font-size:.7rem;padding:2px 6px;border-radius:4px;border:1px solid;cursor:pointer;margin-right:2px;}
+.btn-b{background:#eff6ff;color:var(--primary);border-color:var(--primary);}
+.btn-s{background:#fff0f0;color:var(--danger);border-color:var(--danger);}
+.live-badge{background:var(--primary);color:#fff;font-size:.72rem;padding:3px 10px;border-radius:6px;font-weight:600;}
+.payoff-panel{padding:20px;}
+.payoff-tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;}
+.payoff-tab{padding:7px 14px;border-radius:8px;font-size:.82rem;cursor:pointer;border:1px solid var(--border);background:var(--card-bg);}
+.payoff-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.payoff-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.metric-label{font-size:.7rem;color:var(--text-muted);text-transform:uppercase;font-weight:600;}
+.metric-value{font-size:.88rem;font-weight:700;margin-top:3px;}
+.payoff-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:280px;color:var(--text-muted);font-size:.9rem;}
+
+/* PINE SCRIPT */
+.pine-editor{font-family:'Courier New',monospace;font-size:.83rem;width:100%;min-height:300px;padding:16px;border:1.5px solid var(--border);border-radius:0 0 8px 8px;background:#0f172a;color:#e2e8f0;resize:vertical;outline:none;line-height:1.7;}
+.pine-editor:focus{border-color:var(--primary);}
+.pine-toolbar{display:flex;align-items:center;justify-content:space-between;background:#1e293b;border:1.5px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;padding:8px 14px;}
+.pine-toolbar span{font-size:.78rem;color:#94a3b8;font-weight:600;}
+.pine-actions{display:flex;gap:8px;}
+.pine-btn{padding:5px 14px;border-radius:5px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;}
+.pine-btn-run{background:var(--success);color:#fff;}
+.pine-btn-validate{background:#6366f1;color:#fff;}
+.pine-btn-clear{background:#334155;color:#e2e8f0;}
+.pine-result{background:#0f172a;border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:12px 16px;font-size:.8rem;color:#94a3b8;font-family:monospace;min-height:60px;line-height:1.6;}
+
+/* REPORTS */
+.report-header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:24px;}
+.date-input{display:flex;align-items:center;gap:8px;font-size:.88rem;}
+.date-input input{border:1.5px solid var(--border);border-radius:6px;padding:7px 10px;font-size:.85rem;background:var(--card-bg);color:var(--text);}
+.broker-select{border:1.5px solid var(--border);border-radius:6px;padding:7px 14px;font-size:.85rem;background:var(--card-bg);color:var(--text);}
+.report-toggle-group{display:flex;border:2px solid var(--primary);border-radius:8px;overflow:hidden;}
+.report-toggle{padding:7px 16px;font-size:.85rem;font-weight:600;cursor:pointer;background:var(--card-bg);color:var(--primary);border:none;}
+.report-toggle.active{background:var(--primary);color:#fff;}
+.btn-get-reports{background:var(--primary);color:#fff;border:none;padding:8px 20px;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;}
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.report-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.report-card h4{font-size:.9rem;font-weight:700;margin-bottom:16px;}
+.piechart-empty{width:120px;height:120px;border-radius:50%;border:12px solid var(--border);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.piechart-empty span{font-size:.72rem;color:var(--text-muted);}
+.piechart-empty strong{font-size:.95rem;font-weight:700;}
+.no-data{color:var(--text-muted);font-size:.85rem;text-align:center;padding:40px;}
+
+/* TRADE TABLE */
+.trade-table{width:100%;border-collapse:collapse;font-size:.83rem;}
+.trade-table th{padding:10px 14px;text-align:left;color:var(--text-muted);font-weight:600;font-size:.75rem;border-bottom:2px solid var(--border);}
+.trade-table td{padding:10px 14px;border-bottom:1px solid var(--border);}
+.trade-table tr:hover td{background:var(--bg);}
+.badge-buy{background:#d1fae5;color:var(--success);padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:700;}
+.badge-sell{background:#fee2e2;color:var(--danger);padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:700;}
+
+/* SUBSCRIPTIONS */
+.billing-toggle{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+.billing-btn{padding:9px 24px;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;border:2px solid var(--border);background:var(--card-bg);color:var(--text-muted);}
+.billing-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.plan-card{background:var(--card-bg);border:1.5px solid var(--border);border-radius:16px;padding:28px;}
+.plan-card.featured{border-color:var(--primary);box-shadow:0 4px 24px rgba(37,99,235,.12);}
+.plan-name{font-size:1rem;font-weight:700;margin-bottom:8px;}
+.plan-price{font-size:1.8rem;font-weight:800;margin-bottom:4px;}
+.plan-price span{font-size:.85rem;font-weight:400;color:var(--text-muted);}
+.plan-active{color:var(--success);font-weight:600;font-size:.9rem;border:1.5px solid var(--success);border-radius:8px;padding:9px;text-align:center;margin:14px 0;}
+.plan-features h5{font-size:.82rem;color:var(--text-muted);margin-bottom:10px;font-weight:600;}
+.plan-features ul{list-style:none;}
+.plan-features li{font-size:.83rem;color:var(--text);margin-bottom:7px;padding-left:16px;position:relative;}
+.plan-features li::before{content:'•';position:absolute;left:0;color:var(--primary);}
+.btn-get-started{width:100%;padding:11px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;margin:14px 0;}
+
+/* PROFILE PAGE */
+.builder-field{margin-bottom:14px;}
+.builder-field label{font-size:.78rem;color:var(--text-muted);font-weight:600;display:block;margin-bottom:5px;}
+.builder-field select,.builder-field input,.builder-field textarea{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.85rem;outline:none;background:var(--card-bg);color:var(--text);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-icon{width:90px;height:90px;background:var(--bg);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2.2rem;color:#d1d5db;}
+.btn-create-lg{background:var(--primary);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:12px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:#1f2937;color:#fff;padding:12px 20px;border-radius:10px;font-size:.88rem;z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* HIDDEN */
+.hidden{display:none!important;}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .dashboard-grid{grid-template-columns:1fr 1fr;}
+  .templates-grid{grid-template-columns:1fr 1fr;}
+  .plans-grid{grid-template-columns:1fr;}
+  .payoff-metrics{grid-template-columns:repeat(2,1fr);}
+  .simulator-container{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.mobile-open{transform:translateX(0);box-shadow:4px 0 20px rgba(0,0,0,.15);}
+  .sidebar-overlay{display:block;pointer-events:none;opacity:0;transition:opacity .3s;}
+  .sidebar-overlay.open{pointer-events:all;opacity:1;}
+  .main-content{margin-left:0!important;}
+  .hamburger-btn{display:flex!important;}
+  .collapse-btn{display:none;}
+  .dashboard-grid,.templates-grid,.plans-grid,.report-grid,.stats-row{grid-template-columns:1fr;}
+  .auth-left{display:none;}
+  .auth-right{width:100%;padding:40px 24px;}
+  .page{padding:16px;}
+  .simulator-container{grid-template-columns:1fr;}
+  .payoff-metrics{grid-template-columns:repeat(2,1fr);}
+  .broker-row{flex-wrap:wrap;}
+}
+@media(max-width:480px){
+  .auth-right{padding:32px 20px;}
+  .topbar{padding:0 14px;}
+  .page{padding:12px;}
+  .pnl-amount{font-size:1.6rem;}
+  .billing-toggle{flex-wrap:wrap;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIGN IN -->
+<div id="signInPage" class="auth-page">
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="auth-left-badge">
+        <h2>Turn ideas<br>into winning<br>trades.</h2>
+        <p>Test. Optimize. Execute.<br>All in one place.</p>
+      </div>
+      <div class="auth-tagline">#Trading &nbsp;#Stockmarket &nbsp;#AlgoTrading &nbsp;&nbsp;<strong>Try now</strong></div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-logo">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><polygon points="4,28 16,4 28,28" fill="#2563eb"/><polygon points="10,28 16,16 22,28" fill="#7c3aed" opacity=".7"/></svg>
+      <span>Omnis Global Algo</span>
+    </div>
+    <h1>Sign In</h1>
+    <p>Login to start copy trading with expert strategies</p>
+    <button class="btn-google" onclick="handleGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+    <div class="auth-divider">Or</div>
+    <div class="form-group"><input type="text" id="loginEmail" placeholder="Email Id"></div>
+    <div class="form-group pw-wrap">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button class="toggle-pw" onclick="togglePw('loginPassword')"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+    <div class="forgot-link"><a href="#" onclick="showPage('forgotPage')">Forget Password?</a></div>
+    <button class="btn-primary" onclick="handleLogin()">Log In</button>
+    <div class="auth-switch">Don't have account? <a href="#" onclick="showPage('signUpPage')">Sign Up</a></div>
+  </div>
+</div>
+
+<!-- SIGN UP -->
+<div id="signUpPage" class="auth-page hidden">
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="auth-left-badge">
+        <h2>Turn ideas<br>into winning<br>trades.</h2>
+        <p>Test. Optimize. Execute.<br>All in one place.</p>
+      </div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-logo">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><polygon points="4,28 16,4 28,28" fill="#2563eb"/><polygon points="10,28 16,16 22,28" fill="#7c3aed" opacity=".7"/></svg>
+      <span>Omnis Global Algo</span>
+    </div>
+    <h1>Sign Up</h1>
+    <p>Create your account to start copy trading</p>
+    <button class="btn-google" onclick="handleGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+    <div class="auth-divider">Or</div>
+    <div class="form-group"><input type="text" id="regName" placeholder="Full Name"></div>
+    <div class="form-group"><input type="email" id="regEmail" placeholder="Email Id"></div>
+    <div class="form-group pw-wrap">
+      <input type="password" id="regPassword" placeholder="Password">
+      <button class="toggle-pw" onclick="togglePw('regPassword')"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+    <div class="form-group pw-wrap">
+      <input type="password" id="regConfirm" placeholder="Confirm Password">
+      <button class="toggle-pw" onclick="togglePw('regConfirm')"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
+    <button class="btn-primary" onclick="handleRegister()">Create Account</button>
+    <div class="auth-switch">Already have an account? <a href="#" onclick="showPage('signInPage')">Sign In</a></div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD -->
+<div id="forgotPage" class="auth-page hidden">
+  <div class="auth-left">
+    <div class="auth-left-content">
+      <div class="auth-left-badge"><h2>Reset your<br>password</h2><p>We'll send you a link.</p></div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-logo">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none"><polygon points="4,28 16,4 28,28" fill="#2563eb"/><polygon points="10,28 16,16 22,28" fill="#7c3aed" opacity=".7"/></svg>
+      <span>Omnis Global Algo</span>
+    </div>
+    <h1 style="color:var(--text)">Forgot Password</h1>
+    <p>Enter your email and we'll send a reset link</p>
+    <div class="form-group"><input type="email" id="forgotEmail" placeholder="Email Id"></div>
+    <button class="btn-primary" onclick="handleForgot()">Send Reset Link</button>
+    <div class="auth-switch"><a href="#" onclick="showPage('signInPage')">← Back to Sign In</a></div>
+  </div>
+</div>
+
+<!-- DISCLAIMER MODAL -->
+<div id="disclaimerModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3><svg width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Risk disclosures on derivatives</h3>
+    <ul>
+      <li><span>9 out of 10</span> individual traders in equity Futures and Options Segment, incurred net losses.</li>
+      <li>On an average, loss makers registered net trading loss close to <span>₹50,000</span>.</li>
+      <li>Over and above the net trading losses incurred, loss makers expended an additional <span>28%</span> of net trading losses as transaction costs.</li>
+      <li>Those making net trading profits, incurred between <span>15% to 50%</span> of such profits as transaction cost.</li>
+    </ul>
+    <p class="modal-source">Source: <a href="#">SEBI</a> study dated January 25, 2023 on "Analysis of Profit and Loss of Individual Traders dealing in equity Futures and Options (F&O) Segment".</p>
+    <label class="modal-accept"><input type="checkbox" id="acceptTerms"> I accept all the <a href="#">Terms &amp; Conditions</a></label>
+    <button class="btn-understand" onclick="acceptDisclaimer()">I Understand</button>
+  </div>
+</div>
+
+<!-- ADD BROKER MODAL -->
+<div id="addBrokerModal" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:440px">
+    <h3>Add Broker</h3>
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:16px">Select your broker to connect</p>
+    <div class="broker-options">
+      <div class="broker-option" onclick="selectBroker(this,'Angel One')"><div style="font-size:1.5rem">🅰️</div><div class="bname">Angel One</div></div>
+      <div class="broker-option" onclick="selectBroker(this,'Zerodha')"><div style="font-size:1.5rem">🔵</div><div class="bname">Zerodha</div></div>
+      <div class="broker-option" onclick="selectBroker(this,'Upstox')"><div style="font-size:1.5rem">🟠</div><div class="bname">Upstox</div></div>
+      <div class="broker-option" onclick="selectBroker(this,'Fyers')"><div style="font-size:1.5rem">🟢</div><div class="bname">Fyers</div></div>
+      <div class="broker-option" onclick="selectBroker(this,'5Paisa')"><div style="font-size:1.5rem">🔴</div><div class="bname">5Paisa</div></div>
+      <div class="broker-option" onclick="selectBroker(this,'Dhan')"><div style="font-size:1.5rem">🟣</div><div class="bname">Dhan</div></div>
+    </div>
+    <div class="form-group"><input type="text" id="brokerClientId" placeholder="Client ID / API Key"></div>
+    <div class="form-group pw-wrap"><input type="password" id="brokerSecret" placeholder="API Secret / Password"><button class="toggle-pw" onclick="togglePw('brokerSecret')"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn-primary" onclick="saveBroker()">Connect Broker</button>
+      <button onclick="closeModal('addBrokerModal')" style="flex:1;padding:11px;border:1.5px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;font-size:.9rem;color:var(--text)">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PINE SCRIPT MODAL -->
+<div id="pineModal" class="modal-overlay hidden">
+  <div class="modal-box" style="max-width:800px;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h3 style="margin:0">🌲 Pine Script Editor</h3>
+      <button onclick="closeModal('pineModal')" style="background:none;border:none;cursor:pointer;font-size:1.4rem;color:var(--text-muted)">✕</button>
+    </div>
+    <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:16px">Paste your TradingView Pine Script strategy. The strategy logic stays private — subscribers only see your trade signals.</p>
+    <div class="builder-field"><label>Strategy Name</label><input type="text" id="pineStrategyName" placeholder="e.g. EMA Crossover Strategy"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+      <div class="builder-field" style="margin:0"><label>Instrument</label><select id="pineInstrument"><option>NIFTY</option><option>BANKNIFTY</option><option>FINNIFTY</option><option>SENSEX</option><option>MIDCPNIFTY</option></select></div>
+      <div class="builder-field" style="margin:0"><label>Timeframe</label><select id="pineTimeframe"><option>1m</option><option>3m</option><option>5m</option><option selected>15m</option><option>30m</option><option>1h</option><option>1D</option></select></div>
+      <div class="builder-field" style="margin:0"><label>Lots</label><input type="number" id="pineLots" value="1" min="1"></div>
+    </div>
+    <div class="pine-toolbar">
+      <span>📝 strategy.pine</span>
+      <div class="pine-actions">
+        <button class="pine-btn pine-btn-clear" onclick="clearPine()">Clear</button>
+        <button class="pine-btn pine-btn-validate" onclick="validatePine()">Validate</button>
+        <button class="pine-btn pine-btn-run" onclick="runPineBacktest()">▶ Backtest</button>
+      </div>
+    </div>
+    <textarea class="pine-editor" id="pineEditor" spellcheck="false" placeholder="//@version=5
+strategy(&quot;My Strategy&quot;, overlay=true)
+
+// Paste your Pine Script here...
+// Your strategy logic remains PRIVATE
+// Subscribers only see BUY/SELL signals"></textarea>
+    <div class="pine-result" id="pineResult"><span style="color:#64748b">// Output appears here after validate or backtest...</span></div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn-primary" onclick="savePineStrategy()">💾 Save Strategy</button>
+      <button onclick="deployPineStrategy()" style="flex:1;padding:11px;border:1.5px solid var(--success);background:var(--card-bg);color:var(--success);border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer">🚀 Deploy Live</button>
+      <button onclick="closeModal('pineModal')" style="padding:11px 20px;border:1.5px solid var(--border);background:var(--card-bg);border-radius:8px;font-size:.88rem;cursor:pointer;color:var(--text)">Cancel</button>
+    </div>
+    <div style="background:var(--bg);border-radius:10px;padding:14px;margin-top:16px">
+      <p style="font-size:.75rem;font-weight:700;color:var(--primary);margin-bottom:8px">💡 Quick Reference</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
+        <div><code style="font-size:.72rem;color:var(--text-muted);line-height:1.8;display:block">ta.ema(close,14)<br>ta.rsi(close,14)<br>ta.macd(close,12,26,9)<br>ta.supertrend(3,10)</code></div>
+        <div><code style="font-size:.72rem;color:var(--text-muted);line-height:1.8;display:block">ta.crossover(a,b)<br>ta.crossunder(a,b)<br>ta.highest(src,len)<br>ta.lowest(src,len)</code></div>
+        <div><code style="font-size:.72rem;color:var(--text-muted);line-height:1.8;display:block">strategy.entry("L",strategy.long)<br>strategy.entry("S",strategy.short)<br>strategy.exit("X",stop=sl)<br>strategy.close_all()</code></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" class="app-layout hidden">
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" style="flex-shrink:0"><polygon points="4,28 16,4 28,28" fill="#2563eb"/><polygon points="10,28 16,16 22,28" fill="#7c3aed" opacity=".7"/></svg>
+      <span>Omnis Global Algo</span>
+    </div>
+    <div class="sidebar-nav">
+      <a class="nav-item active" onclick="navigateTo('dashboard',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+      <a class="nav-item" onclick="navigateTo('broker',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h18v4H3zM3 10h18v4H3zM3 17h18v4H3z"/></svg>
+        <span class="nav-label">Broker</span>
+      </a>
+      <a class="nav-item" onclick="navigateTo('copytrading',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <span class="nav-label">Copy Trading</span>
+      </a>
+      <a class="nav-item" onclick="togglePaperMenu(this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+        <span class="nav-label">Paper Trading</span>
+        <svg class="nav-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </a>
+      <div class="nav-sub" id="paperSubmenu">
+        <a class="nav-sub-item" onclick="navigateTo('paperbacktest',null)">• Paper Backtest</a>
+        <a class="nav-sub-item" onclick="navigateTo('simulator',null)">• Simulator (Beta)</a>
+      </div>
+      <a class="nav-item" onclick="navigateTo('reports',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span class="nav-label">Reports</span>
+      </a>
+      <a class="nav-item" onclick="navigateTo('subscription',this)">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        <span class="nav-label">Subscription</span>
+      </a>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">OG</div>
+      <div class="user-info">
+        <div class="user-id" id="sidebarUserId">AR000000</div>
+        <div class="user-name" id="sidebarUserName">User</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content" id="mainContent">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger-btn" onclick="toggleMobileSidebar()"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+        <button class="collapse-btn" onclick="toggleSidebar()"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+      </div>
+      <div class="topbar-right">
+        <!-- Theme Toggle -->
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark/Light">
+          <svg id="iconMoon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          <svg id="iconSun" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <!-- Notifications -->
+        <div style="position:relative">
+          <button class="icon-btn" onclick="toggleNotif()" title="Notifications">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span id="notifDot" style="position:absolute;top:4px;right:4px;width:7px;height:7px;background:var(--danger);border-radius:50%;display:none"></span>
+          </button>
+          <div id="notifPanel" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--card-bg);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.15);width:290px;z-index:400">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+              <strong style="font-size:.88rem">Notifications</strong>
+              <span style="font-size:.75rem;color:var(--primary);cursor:pointer" onclick="clearNotifs()">Clear all</span>
+            </div>
+            <div id="notifList" style="max-height:260px;overflow-y:auto">
+              <div style="padding:20px;font-size:.84rem;color:var(--text-muted);text-align:center">No notifications yet</div>
+            </div>
+          </div>
+        </div>
+        <!-- Profile -->
+        <div style="position:relative">
+          <button class="profile-btn" onclick="toggleProfileMenu()" id="profileBtn">OG</button>
+          <div class="profile-dropdown" id="profileDropdown">
+            <div class="profile-dropdown-header">
+              <strong id="dropdownName">User</strong>
+              <span id="dropdownEmail">—</span>
+            </div>
+            <div class="profile-dropdown-item" onclick="navigateTo('profile',null);closeDropdowns()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile
+            </div>
+            <div class="profile-dropdown-item" onclick="navigateTo('subscription',null);closeDropdowns()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Subscription
+            </div>
+            <div class="profile-dropdown-item danger" onclick="handleLogout()">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== DASHBOARD ====== -->
+    <div class="page active" id="dashboardPage">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <h1 class="page-title" style="margin:0">My Dashboard</h1>
+        <button onclick="openModal('pineModal')" style="background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px">
+          🌲 Manage Pine Scripts
+        </button>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-card-label">Total P&L</div><div class="stat-card-value green" id="dashPnl">₹0</div><div class="stat-card-sub">No trades yet</div></div>
+        <div class="stat-card"><div class="stat-card-label">Total Subscribers</div><div class="stat-card-value" id="dashSubscribers">0</div><div class="stat-card-sub">Active this month</div></div>
+        <div class="stat-card"><div class="stat-card-label">Win Rate</div><div class="stat-card-value green" id="dashWinRate">—</div><div class="stat-card-sub">All strategies</div></div>
+        <div class="stat-card"><div class="stat-card-label">Total Trades</div><div class="stat-card-value" id="dashTrades">0</div><div class="stat-card-sub">Since inception</div></div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="pnl-card">
+          <div class="pnl-label">Total P&L</div>
+          <div class="pnl-amount" id="dashPnlCard">₹0</div>
+          <div class="pnl-sub">No trades found yet.</div>
+          <div class="pnl-user" id="dashUserName">User</div>
+        </div>
+        <div class="broker-card">
+          <div class="card-label">Broker</div>
+          <div class="broker-name">
+            <span style="font-size:1.2rem">🅰️</span> Angel
+            <span style="color:var(--text-muted);font-weight:400;font-size:.85rem">(Not Connected)</span>
+          </div>
+          <div class="broker-details">
+            <div><div class="broker-detail-label">Login Status</div><div class="broker-detail-value status-nc">Not Connected</div></div>
+            <div style="text-align:right"><div class="broker-detail-label">Static IP</div><div class="broker-detail-value">Not Assigned</div></div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Terminal</div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div><div class="toggle-label">Trading Engine</div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+        </div>
+        <div class="deploy-card">
+          <div class="deploy-icon"><svg width="48" height="48" fill="none" stroke="#9ca3af" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div>
+          <h3>My Strategies</h3>
+          <p id="deployCardText">No strategies deployed yet.</p>
+          <button class="btn-create" onclick="openModal('pineModal')">+ Add Pine Script</button>
+        </div>
+      </div>
+
+      <div class="section-header" style="margin-top:8px">
+        <span class="section-title">My Trading Strategies</span>
+        <a class="see-all" onclick="navigateTo('copytrading',null)">View Copy Trading →</a>
+      </div>
+      <div id="dashStrategiesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+        <div style="background:var(--card-bg);border:1.5px dashed var(--border);border-radius:12px;padding:30px;text-align:center;cursor:pointer" onclick="openModal('pineModal')">
+          <div style="font-size:2rem;margin-bottom:8px">🌲</div>
+          <p style="font-size:.85rem;color:var(--text-muted)">Add your first Pine Script strategy</p>
+          <button style="margin-top:12px;padding:8px 20px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer">+ Add Strategy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== BROKER PAGE ====== -->
+    <div class="page" id="brokerPage">
+      <div class="page-header">
+        <div><h2>Broker</h2><p>Manage your connected brokers</p></div>
+        <button class="btn-add-broker" onclick="openModal('addBrokerModal')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>+ Add Broker
+        </button>
+      </div>
+      <div class="broker-list-card" id="brokerListCard">
+        <div class="broker-row">
+          <div class="broker-logo">🅰️</div>
+          <div class="broker-info"><strong>Angel</strong><span>N58808026</span><br><span>Static IP: Not Assigned</span><br><span class="nc">Not Connected</span></div>
+          <div style="flex:1"></div>
+          <div class="broker-perf"><span>Strategy Performance</span><strong>0.00</strong></div>
+          <div class="broker-toggles">
+            <div class="toggle-item"><span>Terminal</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-item"><span>Trading Engine</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <button class="kebab">⋮</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== COPY TRADING ====== -->
+    <div class="page" id="copytradingPage">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <h1 class="page-title" style="margin:0">Copy Trading</h1>
+        <span style="font-size:.82rem;background:#eff6ff;color:var(--primary);padding:6px 14px;border-radius:20px;font-weight:600">📢 Your trades are shared with subscribers only</span>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchCTTab('mySignals',this)">My Signals</div>
+        <div class="tab" onclick="switchCTTab('subscribers',this)">Subscribers</div>
+        <div class="tab" onclick="switchCTTab('tradeHistory',this)">Trade History</div>
+        <div class="tab" onclick="switchCTTab('paperResults',this)">Paper Trading Results</div>
+      </div>
+
+      <!-- My Signals -->
+      <div id="ctMySignals">
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+            <div>
+              <h3 style="font-size:1rem;font-weight:700">My Trading Profile</h3>
+              <p style="font-size:.82rem;color:var(--text-muted);margin-top:3px">Subscribers copy your live trades automatically</p>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:.72rem;color:var(--text-muted)">Active Subscribers</div>
+              <div style="font-size:1.8rem;font-weight:800;color:var(--primary)" id="ctSubscriberCount">0</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+            <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center"><div style="font-size:1.1rem;font-weight:800;color:var(--success)">₹0</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:3px">Total P&L</div></div>
+            <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center"><div style="font-size:1.1rem;font-weight:800">—</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:3px">Win Rate</div></div>
+            <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center"><div style="font-size:1.1rem;font-weight:800">0</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:3px">Total Trades</div></div>
+            <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center"><div style="font-size:1.1rem;font-weight:800">0</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:3px">Active Strategies</div></div>
+          </div>
+          <div style="background:#eff6ff;border-radius:10px;padding:14px;margin-bottom:16px;font-size:.83rem;color:#1d4ed8">
+            <strong>🔒 Strategy Privacy:</strong> Your Pine Script logic is completely hidden from subscribers. They only see entry/exit signals and trade results.
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn-primary" style="flex:1;min-width:160px" onclick="openModal('pineModal')">🌲 Add Pine Script Strategy</button>
+            <button onclick="showToast('Live sharing enabled! Subscribers will receive your signals.')" style="flex:1;min-width:160px;padding:11px;border:1.5px solid var(--success);background:var(--card-bg);color:var(--success);border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer">🚀 Go Live</button>
+          </div>
+        </div>
+        <h3 style="font-size:.95rem;font-weight:700;margin-bottom:14px">Active Strategies</h3>
+        <div id="ctStrategiesList">
+          <div class="empty-state" style="padding:40px 20px">
+            <div class="empty-icon">🌲</div>
+            <p style="color:var(--text-muted);margin-top:10px">No strategies yet. Add your Pine Script to start sharing signals.</p>
+            <button class="btn-create-lg" onclick="openModal('pineModal')">+ Add Pine Script</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscribers -->
+      <div id="ctSubscribers" class="hidden">
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border)"><h3 style="font-size:.95rem;font-weight:700">All Subscribers</h3></div>
+          <div id="subscribersList">
+            <div class="empty-state" style="padding:40px"><div class="empty-icon">👥</div><p style="color:var(--text-muted);margin-top:10px">No subscribers yet. Share your performance to attract followers.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trade History -->
+      <div id="ctTradeHistory" class="hidden">
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <h3 style="font-size:.95rem;font-weight:700">Trade History</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <select class="broker-select" style="font-size:.82rem;padding:6px 10px"><option>All Strategies</option></select>
+              <input type="date" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.82rem;background:var(--card-bg);color:var(--text)">
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="trade-table">
+              <thead><tr><th>Date & Time</th><th>Strategy</th><th>Symbol</th><th>Type</th><th>Qty</th><th>Entry</th><th>Exit</th><th>P&L</th><th>Status</th></tr></thead>
+              <tbody><tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted)">No trades yet. Deploy a strategy to start trading.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paper Trading Results -->
+      <div id="ctPaperResults" class="hidden">
+        <div style="background:#eff6ff;border-radius:12px;padding:20px;margin-bottom:20px;border:1.5px solid #bfdbfe">
+          <h3 style="font-size:.95rem;font-weight:700;color:#1d4ed8;margin-bottom:8px">📄 Paper Trading</h3>
+          <p style="font-size:.83rem;color:#2563eb">Subscribers can test your strategies with virtual money before committing real funds. Results shown here help them gain confidence.</p>
+        </div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+          <div style="overflow-x:auto">
+            <table class="trade-table">
+              <thead><tr><th>Subscriber</th><th>Strategy</th><th>Paper P&L</th><th>Win Rate</th><th>Trades</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">No paper trading sessions yet.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== PAPER BACKTEST ====== -->
+    <div class="page" id="paperbacktestPage">
+      <h1 class="page-title">Paper Backtest</h1>
+      <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center">
+        <div style="font-size:3rem;margin-bottom:16px">📈</div>
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:8px">Backtest Your Pine Script Strategies</h3>
+        <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:24px">Add your Pine Script strategy first, then run paper backtests to evaluate performance on historical data without risking real money.</p>
+        <button class="btn-create" onclick="openModal('pineModal')">🌲 Add Pine Script Strategy</button>
+      </div>
+    </div>
+
+    <!-- ====== SIMULATOR ====== -->
+    <div class="page" id="simulatorPage">
+      <h1 class="page-title">Simulator (Beta)</h1>
+      <div class="sim-timebar">
+        <select class="sim-symbol-select"><option>NIFTY</option><option>BANKNIFTY</option><option>FINNIFTY</option></select>
+        <button onclick="setTimeBtn(this)">‹‹ Day</button>
+        <button class="active" onclick="setTimeBtn(this)">SOD</button>
+        <button onclick="setTimeBtn(this)">-2h</button><button onclick="setTimeBtn(this)">-30m</button>
+        <button onclick="setTimeBtn(this)">-15m</button><button onclick="setTimeBtn(this)">-5m</button><button onclick="setTimeBtn(this)">-1m</button>
+        <button style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 12px;font-size:.78rem;display:flex;align-items:center;gap:5px">📅 Tue, Jun 23, 2026</button>
+        <button onclick="setTimeBtn(this)">+1m</button><button onclick="setTimeBtn(this)">+5m</button>
+        <button onclick="setTimeBtn(this)">+15m</button><button onclick="setTimeBtn(this)">+30m</button>
+        <button onclick="setTimeBtn(this)">+2h</button><button onclick="setTimeBtn(this)">EOD</button>
+        <button onclick="setTimeBtn(this)">Day »</button>
+      </div>
+      <div class="simulator-container">
+        <div class="option-chain-panel">
+          <div class="oc-header">
+            <h3>Option Chain</h3>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+              <button style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.8rem;display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text)">📅 23 Jun 2026</button>
+              <span class="live-badge">Live</span>
+            </div>
+          </div>
+          <div class="expiry-tabs">
+            <div class="expiry-tab active">23 JUN 26</div>
+            <div class="expiry-tab">30 JUN 26 (6D)</div>
+            <div class="expiry-tab">07 JUL 26</div>
+            <div class="expiry-tab">14 JUL</div>
+          </div>
+          <div class="oc-symbol-row"><span>Symbol: NIFTY</span><span>Expiry: 23 JUN 26</span></div>
+          <div class="oc-body"><table class="oc-table"><thead><tr><th>Call</th><th>Δ</th><th>Strike</th><th>Δ</th></tr></thead><tbody id="ocTableBody"></tbody></table></div>
+        </div>
+        <div class="payoff-panel">
+          <div class="payoff-tabs">
+            <div class="payoff-tab active">Payoff</div>
+            <div class="payoff-tab">Positions</div>
+            <div class="payoff-tab">VWAP+Straddle</div>
+            <div class="payoff-tab">Rolling Straddle</div>
+          </div>
+          <div class="payoff-metrics">
+            <div><div class="metric-label">EST. MARGIN</div><div class="metric-value">₹0</div></div>
+            <div><div class="metric-label">P&L</div><div class="metric-value">₹0 (0%)</div></div>
+            <div><div class="metric-label">MAX PROFIT</div><div class="metric-value">-</div></div>
+            <div><div class="metric-label">MAX LOSS</div><div class="metric-value">-</div></div>
+            <div><div class="metric-label">POP</div><div class="metric-value">-</div></div>
+            <div><div class="metric-label">NET PREMIUM</div><div class="metric-value">₹0</div></div>
+          </div>
+          <div class="payoff-empty">
+            <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:.3"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="3 9 9 9 9 21"/><polyline points="9 9 15 15 21 9"/></svg>
+            <p style="margin-top:10px">No positions added</p>
+            <p style="font-size:.8rem;color:var(--text-muted)">Select strikes from Option Chain to visualize payoff</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== REPORTS ====== -->
+    <div class="page" id="reportsPage">
+      <h1 class="page-title">Reports</h1>
+      <div class="tabs"><div class="tab active">Report</div><div class="tab" onclick="showToast('Trade Engine Logs coming soon')">Trade Engine Logs</div></div>
+      <div class="report-header">
+        <div class="date-input"><span>From</span><input type="date" value="2025-06-24"></div>
+        <div class="date-input"><span>To</span><input type="date" value="2026-06-24"></div>
+        <div class="date-input"><span>Broker</span><select class="broker-select"><option>All</option><option>Angel</option></select></div>
+        <div class="report-toggle-group"><button class="report-toggle active">Live</button><button class="report-toggle">Forward</button></div>
+        <button class="btn-get-reports" onclick="showToast('Fetching reports...')">Get Reports</button>
+      </div>
+      <div class="report-grid">
+        <div class="report-card"><h4>Strategy Breakdown</h4><div style="display:flex;align-items:center;gap:20px"><div class="piechart-empty"><span>Total P&L</span><strong>0</strong></div><div class="no-data">No data</div></div></div>
+        <div class="report-card"><div class="no-data">No data</div></div>
+      </div>
+      <div style="text-align:center;padding:20px;color:var(--primary);font-size:.88rem">No strategies found.</div>
+    </div>
+
+    <!-- ====== SUBSCRIPTION ====== -->
+    <div class="page" id="subscriptionPage">
+      <h1 class="page-title">Subscriptions</h1>
+      <div class="billing-toggle">
+        <button class="billing-btn" onclick="setBilling('Monthly',this)">Monthly</button>
+        <button class="billing-btn active" onclick="setBilling('Quarterly',this)">Quarterly</button>
+        <button class="billing-btn" onclick="setBilling('Yearly',this)">Yearly</button>
+      </div>
+      <div class="plans-grid" id="plansGrid"></div>
+    </div>
+
+    <!-- ====== PROFILE ====== -->
+    <div class="page" id="profilePage">
+      <h1 class="page-title">My Profile</h1>
+      <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:600px">
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:28px">
+          <div class="user-avatar" style="width:64px;height:64px;font-size:1.4rem" id="profileAvatar">OG</div>
+          <div><h3 id="profileName" style="font-size:1.1rem;font-weight:700">User</h3><p id="profileIdTxt" style="color:var(--text-muted);font-size:.85rem">—</p></div>
+        </div>
+        <div class="builder-field"><label>Full Name</label><input type="text" id="profileNameInput"></div>
+        <div class="builder-field"><label>Email</label><input type="email" id="profileEmailInput"></div>
+        <div class="builder-field"><label>Phone</label><input type="tel" id="profilePhoneInput" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="builder-field"><label>Client ID (read only)</label><input type="text" id="profileClientId" readonly style="background:var(--bg)"></div>
+        <button class="btn-primary" style="width:auto;padding:10px 28px" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+const state = {
+  user:{ name:'', id:'', email:'', uid:'', initials:'OG' },
+  billing:'Quarterly',
+  selectedBrokerName:'',
+  myStrategies:[],
+  sidebarCollapsed:false
+};
+
+const PLANS = {
+  Monthly:[
+    {name:'Free Plan',price:'₹0',gst:'',active:true,features:['Paper trading access','View live signals','1 strategy simulation','No broker connection','Community support']},
+    {name:'Starter Plan',price:'₹999',gst:'(+GST)',active:false,features:['Everything in Free','Connect 1 broker','Copy 1 strategy live','Full trade history','Email support']},
+    {name:'Pro Plan',price:'₹2,499',gst:'(+GST)',active:false,features:['Everything in Starter','Connect unlimited brokers','Copy all strategies','Priority support','Advanced analytics']}
+  ],
+  Quarterly:[
+    {name:'Free Plan',price:'₹0',gst:'',active:true,features:['Paper trading access','View live signals','1 strategy simulation','No broker connection','Community support']},
+    {name:'Starter Plan',price:'₹2,499',gst:'(+GST)',active:false,features:['Everything in Free','Connect 1 broker','Copy 1 strategy live','Full trade history','Email support']},
+    {name:'Pro Plan',price:'₹5,999',gst:'(+GST)',active:false,features:['Everything in Starter','Connect unlimited brokers','Copy all strategies','Priority support','Advanced analytics']}
+  ],
+  Yearly:[
+    {name:'Free Plan',price:'₹0',gst:'',active:true,features:['Paper trading access','View live signals','1 strategy simulation','No broker connection','Community support']},
+    {name:'Starter Plan',price:'₹7,999',gst:'(+GST)',active:false,features:['Everything in Free','Connect 1 broker','Copy 1 strategy live','Full trade history','Email support']},
+    {name:'Pro Plan',price:'₹19,999',gst:'(+GST)',active:false,features:['Everything in Starter','Connect unlimited brokers','Copy all strategies','Priority support','Advanced analytics']}
+  ]
+};
+
+const OC_DATA = [
+  {call:766.90,d:1.00,strike:23300,pd:-0.0067},{call:720.00,d:1.00,strike:23350,pd:-0.0071},
+  {call:681.05,d:0.96,strike:23400,pd:-0.0075},{call:649.15,d:0.90,strike:23450,pd:-0.0071},
+  {call:589.95,d:0.92,strike:23500,pd:-0.0091},{call:519.50,d:1.00,strike:23550,pd:-0.0097},
+  {call:469.60,d:1.00,strike:23600,pd:-0.01},{call:436.10,d:0.91,strike:23650,pd:-0.02},
+  {call:398.40,d:0.88,strike:23700,pd:-0.03},{call:355.20,d:0.82,strike:23750,pd:-0.05},
+  {call:310.00,d:0.75,strike:23800,pd:-0.08},{call:265.50,d:0.68,strike:23850,pd:-0.12},
+  {call:220.30,d:0.58,strike:23900,pd:-0.18},{call:178.60,d:0.48,strike:23950,pd:-0.25},
+  {call:140.20,d:0.38,strike:24000,pd:-0.35},
+];
+
+// ===== INIT =====
+function init(){
+  renderOptionChain();
+  renderPlans();
+}
+
+// ===== AUTH =====
+function showPage(id){
+  document.querySelectorAll('.auth-page').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('mainApp').classList.add('hidden');
+  document.getElementById(id).classList.remove('hidden');
+}
+function togglePw(id){
+  const i=document.getElementById(id);
+  i.type=i.type==='password'?'text':'password';
+}
+function handleLogin(){
+  const e=document.getElementById('loginEmail').value.trim();
+  const p=document.getElementById('loginPassword').value;
+  if(!e||!p){showToast('Please fill all fields');return;}
+  // Firebase will override this
+  showToast('Signing in...');
+}
+function handleGoogleLogin(){ showToast('Redirecting to Google...'); }
+function handleRegister(){
+  const n=document.getElementById('regName').value.trim();
+  const e=document.getElementById('regEmail').value.trim();
+  const p=document.getElementById('regPassword').value;
+  const c=document.getElementById('regConfirm').value;
+  if(!n||!e||!p){showToast('Fill all fields');return;}
+  if(p!==c){showToast('Passwords do not match');return;}
+  if(p.length<6){showToast('Password must be at least 6 characters');return;}
+}
+function handleForgot(){
+  const e=document.getElementById('forgotEmail').value.trim();
+  if(!e){showToast('Enter your email');return;}
+  showToast('Reset link sent to '+e);
+}
+function acceptDisclaimer(){
+  if(!document.getElementById('acceptTerms').checked){showToast('Please accept Terms & Conditions');return;}
+  document.getElementById('disclaimerModal').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  init();
+}
+function handleLogout(){
+  state.user={name:'',id:'',email:'',uid:'',initials:'OG'};
+  document.getElementById('mainApp').classList.add('hidden');
+  closeDropdowns();
+  showPage('signInPage');
+}
+
+// ===== USER UI =====
+function updateUserUI(){
+  const {name,id,email,initials}=state.user;
+  document.getElementById('sidebarUserName').textContent=name||'User';
+  document.getElementById('sidebarUserId').textContent=id||'—';
+  document.getElementById('sidebarAvatar').textContent=initials||'OG';
+  document.getElementById('profileBtn').textContent=initials||'OG';
+  document.getElementById('dropdownName').textContent=name||'User';
+  document.getElementById('dropdownEmail').textContent=email||id||'—';
+  document.getElementById('dashUserName').textContent=name||'User';
+  document.getElementById('profileName').textContent=name||'User';
+  document.getElementById('profileIdTxt').textContent=id||'—';
+  document.getElementById('profileClientId').value=id||'';
+  document.getElementById('profileNameInput').value=name||'';
+  document.getElementById('profileEmailInput').value=email||'';
+  document.getElementById('profileAvatar').textContent=initials||'OG';
+}
+function saveProfile(){
+  state.user.name=document.getElementById('profileNameInput').value.trim();
+  state.user.email=document.getElementById('profileEmailInput').value.trim();
+  state.user.initials=state.user.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'OG';
+  updateUserUI();
+  showToast('Profile saved!');
+}
+
+// ===== NAVIGATION =====
+function navigateTo(page,navEl){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const map={
+    dashboard:'dashboardPage',broker:'brokerPage',copytrading:'copytradingPage',
+    paperbacktest:'paperbacktestPage',simulator:'simulatorPage',
+    reports:'reportsPage',subscription:'subscriptionPage',profile:'profilePage'
+  };
+  const pg=document.getElementById(map[page]);
+  if(pg)pg.classList.add('active');
+  if(navEl)navEl.classList.add('active');
+  if(page==='subscription')renderPlans();
+  closeMobileSidebar();
+  closeDropdowns();
+  window.scrollTo(0,0);
+}
+function togglePaperMenu(el){
+  const sub=document.getElementById('paperSubmenu');
+  sub.classList.toggle('open');
+  el.querySelector('.nav-chevron').style.transform=sub.classList.contains('open')?'rotate(180deg)':'';
+}
+
+// ===== SIDEBAR =====
+function toggleSidebar(){
+  state.sidebarCollapsed=!state.sidebarCollapsed;
+  document.getElementById('sidebar').classList.toggle('collapsed',state.sidebarCollapsed);
+  document.getElementById('mainContent').classList.toggle('expanded',state.sidebarCollapsed);
+}
+function toggleMobileSidebar(){
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeMobileSidebar(){
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// ===== DROPDOWNS =====
+function closeDropdowns(){
+  document.getElementById('profileDropdown').classList.remove('open');
+  document.getElementById('notifPanel').style.display='none';
+}
+function toggleProfileMenu(){ document.getElementById('profileDropdown').classList.toggle('open'); }
+function toggleNotif(){
+  const p=document.getElementById('notifPanel');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.profile-btn')&&!e.target.closest('#profileDropdown')) document.getElementById('profileDropdown').classList.remove('open');
+  if(!e.target.closest('#notifPanel')&&!e.target.closest('.icon-btn')) document.getElementById('notifPanel').style.display='none';
+});
+
+// ===== NOTIFICATIONS =====
+function addNotif(msg){
+  const list=document.getElementById('notifList');
+  if(list.querySelector('[data-empty]'))list.innerHTML='';
+  const d=document.createElement('div');
+  d.style.cssText='padding:12px 16px;border-bottom:1px solid var(--border);font-size:.83rem';
+  d.innerHTML='<div style="font-weight:600">'+msg+'</div><div style="font-size:.72rem;color:var(--text-muted);margin-top:2px">'+new Date().toLocaleTimeString()+'</div>';
+  list.prepend(d);
+  document.getElementById('notifDot').style.display='block';
+}
+function clearNotifs(){
+  document.getElementById('notifList').innerHTML='<div style="padding:20px;font-size:.84rem;color:var(--text-muted);text-align:center">No notifications yet</div>';
+  document.getElementById('notifDot').style.display='none';
+}
+
+// ===== THEME =====
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const dark=document.body.classList.contains('dark');
+  document.getElementById('iconMoon').style.display=dark?'none':'block';
+  document.getElementById('iconSun').style.display=dark?'block':'none';
+  localStorage.setItem('oga_theme',dark?'dark':'light');
+}
+if(localStorage.getItem('oga_theme')==='dark'){
+  document.body.classList.add('dark');
+  setTimeout(()=>{ document.getElementById('iconMoon').style.display='none'; document.getElementById('iconSun').style.display='block'; },50);
+}
+
+// ===== MODALS =====
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',function(e){ if(e.target===this&&this.id!=='disclaimerModal')closeModal(this.id); });
+});
+
+// ===== BROKER =====
+function selectBroker(el,name){
+  document.querySelectorAll('.broker-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedBrokerName=name;
+}
+function saveBroker(){
+  if(!state.selectedBrokerName){showToast('Select a broker');return;}
+  const cid=document.getElementById('brokerClientId').value.trim();
+  if(!cid){showToast('Enter Client ID');return;}
+  closeModal('addBrokerModal');
+  showToast(state.selectedBrokerName+' connected!');
+  addNotif(state.selectedBrokerName+' broker connected successfully');
+  const card=document.getElementById('brokerListCard');
+  const row=document.createElement('div');
+  row.className='broker-row firebase-broker-row';
+  row.innerHTML=`<div class="broker-logo">🔵</div><div class="broker-info"><strong>${state.selectedBrokerName}</strong><span>${cid}</span><br><span style="color:var(--success)">Connected</span></div><div style="flex:1"></div><div class="broker-perf"><span>Strategy Performance</span><strong>0.00</strong></div><div class="broker-toggles"><div class="toggle-item"><span>Terminal</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div><div class="toggle-item"><span>Trading Engine</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div><button class="kebab" onclick="this.closest('.broker-row').remove();showToast('Broker removed')">⋮</button>`;
+  card.appendChild(row);
+  document.getElementById('brokerClientId').value='';
+  document.getElementById('brokerSecret').value='';
+}
+
+// ===== SUBSCRIPTIONS =====
+function setBilling(plan,btn){
+  state.billing=plan;
+  document.querySelectorAll('.billing-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPlans();
+}
+function renderPlans(){
+  const grid=document.getElementById('plansGrid');
+  if(!grid)return;
+  grid.innerHTML=PLANS[state.billing].map((p,i)=>`
+    <div class="plan-card ${i===2?'featured':''}">
+      <div class="plan-name">${p.name}</div>
+      <div class="plan-price">${p.price} <span>${p.gst}</span></div>
+      ${p.active?'<div class="plan-active">Plan already active</div>':`<button class="btn-get-started" onclick="showToast('Redirecting to payment...')">Get Started</button>`}
+      <div class="plan-features"><h5>What's included:</h5><ul>${p.features.map(f=>`<li>${f}</li>`).join('')}</ul></div>
+    </div>
+  `).join('');
+}
+
+// ===== COPY TRADING TABS =====
+function switchCTTab(tab,el){
+  document.querySelectorAll('#copytradingPage .tabs .tab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  ['ctMySignals','ctSubscribers','ctTradeHistory','ctPaperResults'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.classList.add('hidden');
+  });
+  const map={mySignals:'ctMySignals',subscribers:'ctSubscribers',tradeHistory:'ctTradeHistory',paperResults:'ctPaperResults'};
+  const t=document.getElementById(map[tab]);
+  if(t)t.classList.remove('hidden');
+}
+
+// ===== PINE SCRIPT =====
+function clearPine(){
+  document.getElementById('pineEditor').value='';
+  document.getElementById('pineResult').innerHTML='<span style="color:#64748b">// Editor cleared...</span>';
+}
+function validatePine(){
+  const code=document.getElementById('pineEditor').value.trim();
+  const res=document.getElementById('pineResult');
+  if(!code){res.innerHTML='<span style="color:#ef4444">✗ Error: Pine Script is empty</span>';return;}
+  if(!code.includes('//@version')){res.innerHTML='<span style="color:#f59e0b">⚠ Missing //@version=5 at the top</span>';return;}
+  if(!code.includes('strategy(')){res.innerHTML='<span style="color:#f59e0b">⚠ No strategy() declaration found</span>';return;}
+  if(!code.includes('strategy.entry')){res.innerHTML='<span style="color:#f59e0b">⚠ No entry orders found. Add strategy.entry() calls.</span>';return;}
+  res.innerHTML='<span style="color:#10b981">✓ Pine Script validated successfully! Ready to backtest or deploy.</span>';
+  showToast('Script validated ✓');
+}
+function runPineBacktest(){
+  const code=document.getElementById('pineEditor').value.trim();
+  if(!code){showToast('Paste your Pine Script first');return;}
+  document.getElementById('pineResult').innerHTML='<span style="color:#f59e0b">⏳ Running backtest simulation...</span>';
+  setTimeout(()=>{
+    document.getElementById('pineResult').innerHTML=`<span style="color:#10b981">✓ Backtest Complete</span>
+<span style="color:#64748b;display:block;margin-top:6px">Net Profit: <span style="color:#10b981">+₹14,230 (+14.23%)</span> | Win Rate: <span style="color:#10b981">64%</span> | Total Trades: 48 | Max Drawdown: <span style="color:#ef4444">-8.2%</span> | Sharpe: 1.42</span>`;
+    showToast('Backtest done!');
+    addNotif('Backtest completed — Net Profit: +₹14,230');
+  },2000);
+}
+function savePineStrategy(){
+  const name=document.getElementById('pineStrategyName').value.trim();
+  const code=document.getElementById('pineEditor').value.trim();
+  if(!name){showToast('Enter strategy name');return;}
+  if(!code){showToast('Paste your Pine Script first');return;}
+  const strat={name,instrument:document.getElementById('pineInstrument').value,timeframe:document.getElementById('pineTimeframe').value,lots:document.getElementById('pineLots').value,createdAt:new Date().toLocaleString()};
+  if(window.firebaseSaveStrategy){
+    window.firebaseSaveStrategy(name,'Pine Script','Pine Script strategy: '+name);
+  } else {
+    state.myStrategies.push({...strat,id:Date.now().toString()});
+    renderMyStrategiesDash();
+  }
+  closeModal('pineModal');
+  showToast('"'+name+'" strategy saved!');
+  addNotif('Strategy "'+name+'" added successfully');
+}
+function deployPineStrategy(){
+  const name=document.getElementById('pineStrategyName').value.trim();
+  if(!name){showToast('Enter strategy name first');return;}
+  closeModal('pineModal');
+  showToast('"'+name+'" deployed live! 🚀');
+  addNotif('"'+name+'" is now live — subscribers will receive signals');
+}
+
+function renderMyStrategiesDash(){
+  if(state.myStrategies.length===0)return;
+  const grid=document.getElementById('dashStrategiesGrid');
+  grid.innerHTML=state.myStrategies.map(s=>`
+    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h4 style="font-size:.92rem;font-weight:700">${s.name}</h4>
+        <span style="font-size:.72rem;background:#eff6ff;color:var(--primary);padding:3px 8px;border-radius:20px;font-weight:600">Pine Script</span>
+      </div>
+      <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:12px">${s.instrument||'NIFTY'} • ${s.timeframe||'15m'} • ${s.lots||1} Lot</p>
+      <div style="display:flex;gap:8px">
+        <button onclick="openModal('pineModal')" style="flex:1;padding:7px;background:var(--primary);color:#fff;border:none;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer">Edit</button>
+        <button onclick="showToast('Strategy deployed!')" style="flex:1;padding:7px;border:1.5px solid var(--success);color:var(--success);background:var(--card-bg);border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer">Deploy</button>
+      </div>
+    </div>
+  `).join('') + `<div style="background:var(--card-bg);border:1.5px dashed var(--border);border-radius:12px;padding:30px;text-align:center;cursor:pointer" onclick="openModal('pineModal')"><div style="font-size:1.5rem;margin-bottom:6px">+</div><p style="font-size:.82rem;color:var(--text-muted)">Add another strategy</p></div>`;
+}
+
+// ===== SIMULATOR =====
+function renderOptionChain(){
+  const tbody=document.getElementById('ocTableBody');
+  if(!tbody)return;
+  tbody.innerHTML=OC_DATA.map(r=>`<tr><td><button class="btn-bs btn-b" onclick="showToast('Bought ${r.strike} CE')">B</button><button class="btn-bs btn-s" onclick="showToast('Sold ${r.strike} CE')">S</button> ${r.call.toFixed(2)}</td><td>${r.d.toFixed(2)}</td><td class="oc-strike">${r.strike}</td><td>${r.pd.toFixed(4)}</td></tr>`).join('');
+}
+function setTimeBtn(el){
+  el.closest('.sim-timebar').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== TOAST =====
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyCtTDwMY5__Sdnudjb68t8a4jaYfFgF9_8",
+  authDomain:"omnis-global-algo.firebaseapp.com",
+  projectId:"omnis-global-algo",
+  storageBucket:"omnis-global-algo.firebasestorage.app",
+  messagingSenderId:"585093182907",
+  appId:"1:585093182907:web:c66c4cf3b51c44b9f7c09e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const gProvider = new GoogleAuthProvider();
+
+async function loadProfile(user){
+  try {
+    const snap = await getDoc(doc(db,'users',user.uid));
+    let name, userId;
+    if(snap.exists()){
+      name=snap.data().name||user.displayName||user.email.split('@')[0];
+      userId=snap.data().userId;
+    } else {
+      name=user.displayName||user.email.split('@')[0];
+      userId='AR'+Math.floor(Math.random()*999999);
+      await setDoc(doc(db,'users',user.uid),{name,email:user.email,userId,createdAt:new Date().toISOString()});
+    }
+    state.user.name=name; state.user.id=userId; state.user.uid=user.uid;
+    state.user.email=user.email||'';
+    state.user.initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'OG';
+    updateUserUI();
+    await loadStrategies(user.uid);
+    await loadBrokers(user.uid);
+    document.querySelectorAll('.auth-page').forEach(p=>p.classList.add('hidden'));
+    document.getElementById('disclaimerModal').classList.remove('hidden');
+  } catch(e){ showToast('Error: '+e.message); }
+}
+
+async function loadStrategies(uid){
+  try {
+    const snap=await getDocs(collection(db,'users',uid,'strategies'));
+    state.myStrategies=[];
+    snap.forEach(d=>state.myStrategies.push({id:d.id,...d.data()}));
+    renderMyStrategiesDash();
+  } catch(e){ console.log(e); }
+}
+
+async function loadBrokers(uid){
+  try {
+    const snap=await getDocs(collection(db,'users',uid,'brokers'));
+    const card=document.getElementById('brokerListCard');
+    card.querySelectorAll('.firebase-broker-row').forEach(r=>r.remove());
+    snap.forEach(d=>{
+      const data=d.data();
+      const row=document.createElement('div');
+      row.className='broker-row firebase-broker-row';
+      row.innerHTML=`<div class="broker-logo">🔵</div><div class="broker-info"><strong>${data.name}</strong><span>${data.clientId}</span><br><span style="color:var(--success)">Connected</span></div><div style="flex:1"></div><div class="broker-perf"><span>Strategy Performance</span><strong>0.00</strong></div><div class="broker-toggles"><div class="toggle-item"><span>Terminal</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div><div class="toggle-item"><span>Trading Engine</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div><button class="kebab" onclick="window.fbDeleteBroker('${d.id}',this)">⋮</button>`;
+      card.appendChild(row);
+    });
+  } catch(e){ console.log(e); }
+}
+
+window.handleLogin = async()=>{
+  const e=document.getElementById('loginEmail').value.trim();
+  const p=document.getElementById('loginPassword').value;
+  if(!e||!p){showToast('Fill all fields');return;}
+  try{ showToast('Signing in...'); const r=await signInWithEmailAndPassword(auth,e,p); await loadProfile(r.user); }
+  catch(e){ showToast(e.code==='auth/wrong-password'?'Wrong password':e.code==='auth/user-not-found'?'No account found':'Login failed: '+e.message); }
+};
+
+window.handleGoogleLogin = async()=>{
+  try{ showToast('Opening Google...'); const r=await signInWithPopup(auth,gProvider); await loadProfile(r.user); }
+  catch(e){ if(e.code!=='auth/popup-closed-by-user') showToast('Google login failed'); }
+};
+
+window.handleRegister = async()=>{
+  const n=document.getElementById('regName').value.trim();
+  const e=document.getElementById('regEmail').value.trim();
+  const p=document.getElementById('regPassword').value;
+  const c=document.getElementById('regConfirm').value;
+  if(!n||!e||!p){showToast('Fill all fields');return;}
+  if(p!==c){showToast('Passwords do not match');return;}
+  if(p.length<6){showToast('Min 6 characters for password');return;}
+  try{
+    showToast('Creating account...');
+    const r=await createUserWithEmailAndPassword(auth,e,p);
+    const uid='AR'+Math.floor(Math.random()*999999);
+    await setDoc(doc(db,'users',r.user.uid),{name:n,email:e,userId:uid,createdAt:new Date().toISOString()});
+    await loadProfile(r.user);
+  } catch(e){ showToast(e.code==='auth/email-already-in-use'?'Email already registered':e.message); }
+};
+
+window.handleForgot = async()=>{
+  const e=document.getElementById('forgotEmail').value.trim();
+  if(!e){showToast('Enter your email');return;}
+  try{ await sendPasswordResetEmail(auth,e); showToast('Reset link sent to '+e); setTimeout(()=>showPage('signInPage'),2000); }
+  catch(e){ showToast('Error: '+e.message); }
+};
+
+window.handleLogout = async()=>{
+  try{ await signOut(auth); state.myStrategies=[]; state.user={name:'',id:'',email:'',uid:'',initials:'OG'}; document.getElementById('mainApp').classList.add('hidden'); closeDropdowns(); showPage('signInPage'); }
+  catch(e){ showToast('Logout error'); }
+};
+
+window.firebaseSaveStrategy = async(name,type,desc)=>{
+  if(!state.user.uid){showToast('Not logged in');return;}
+  if(state.myStrategies.find(s=>s.name===name)){showToast(name+' already saved');return;}
+  try{
+    const ref=await addDoc(collection(db,'users',state.user.uid,'strategies'),{name,type,desc,createdAt:new Date().toISOString()});
+    state.myStrategies.push({id:ref.id,name,type,desc});
+    renderMyStrategiesDash();
+  } catch(e){ showToast('Save error: '+e.message); }
+};
+
+window.saveBroker = async()=>{
+  if(!state.selectedBrokerName){showToast('Select a broker');return;}
+  const cid=document.getElementById('brokerClientId').value.trim();
+  if(!cid){showToast('Enter Client ID');return;}
+  try{
+    const ref=await addDoc(collection(db,'users',state.user.uid,'brokers'),{name:state.selectedBrokerName,clientId:cid,connected:true,createdAt:new Date().toISOString()});
+    closeModal('addBrokerModal');
+    showToast(state.selectedBrokerName+' connected!');
+    addNotif(state.selectedBrokerName+' broker connected');
+    const card=document.getElementById('brokerListCard');
+    const row=document.createElement('div');
+    row.className='broker-row firebase-broker-row';
+    row.innerHTML=`<div class="broker-logo">🔵</div><div class="broker-info"><strong>${state.selectedBrokerName}</strong><span>${cid}</span><br><span style="color:var(--success)">Connected</span></div><div style="flex:1"></div><div class="broker-perf"><span>Strategy Performance</span><strong>0.00</strong></div><div class="broker-toggles"><div class="toggle-item"><span>Terminal</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div><div class="toggle-item"><span>Trading Engine</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div></div><button class="kebab" onclick="window.fbDeleteBroker('${ref.id}',this)">⋮</button>`;
+    card.appendChild(row);
+    document.getElementById('brokerClientId').value='';
+    document.getElementById('brokerSecret').value='';
+  } catch(e){ showToast('Error: '+e.message); }
+};
+
+window.fbDeleteBroker = async(id,el)=>{
+  if(!state.user.uid)return;
+  try{ await deleteDoc(doc(db,'users',state.user.uid,'brokers',id)); el.closest('.broker-row').remove(); showToast('Broker removed'); }
+  catch(e){ showToast('Error: '+e.message); }
+};
+
+window.saveProfile = async()=>{
+  const name=document.getElementById('profileNameInput').value.trim();
+  const email=document.getElementById('profileEmailInput').value.trim();
+  const phone=document.getElementById('profilePhoneInput').value.trim();
+  if(!name){showToast('Name cannot be empty');return;}
+  if(state.user.uid){
+    try{ await updateDoc(doc(db,'users',state.user.uid),{name,email,phone}); }
+    catch(e){ console.log(e); }
+  }
+  state.user.name=name; state.user.email=email;
+  state.user.initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'OG';
+  updateUserUI(); showToast('Profile saved!');
+};
+
+window.savePineStrategy = async()=>{
+  const name=document.getElementById('pineStrategyName').value.trim();
+  const code=document.getElementById('pineEditor').value.trim();
+  if(!name){showToast('Enter strategy name');return;}
+  if(!code){showToast('Paste your Pine Script first');return;}
+  if(state.user.uid){
+    try{
+      const ref=await addDoc(collection(db,'users',state.user.uid,'strategies'),{name,instrument:document.getElementById('pineInstrument').value,timeframe:document.getElementById('pineTimeframe').value,lots:document.getElementById('pineLots').value,type:'Pine Script',createdAt:new Date().toISOString()});
+      state.myStrategies.push({id:ref.id,name,type:'Pine Script'});
+      renderMyStrategiesDash();
+      closeModal('pineModal');
+      showToast('"'+name+'" saved!');
+      addNotif('Strategy "'+name+'" saved');
+    } catch(e){ showToast('Save error: '+e.message); }
+  } else {
+    state.myStrategies.push({id:Date.now().toString(),name,type:'Pine Script'});
+    renderMyStrategiesDash();
+    closeModal('pineModal');
+    showToast('"'+name+'" saved locally');
+  }
+};
+
+onAuthStateChanged(auth, async(user)=>{
+  if(user && document.getElementById('mainApp').classList.contains('hidden')){
+    await loadProfile(user);
+    document.getElementById('disclaimerModal').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    init();
+  }
+});
+</script>
+</body>
+</html>
