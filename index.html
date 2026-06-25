@@ -1860,5 +1860,320 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   });
 });
 </script>
+
+<!-- ==================== FIREBASE ==================== -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signOut,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged,
+    sendPasswordResetEmail
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ---- FIREBASE CONFIG ----
+  const firebaseConfig = {
+    apiKey: "AIzaSyCtTDwMY5__Sdnudjb68t8a4jaYfFgF9_8",
+    authDomain: "omnis-global-algo.firebaseapp.com",
+    projectId: "omnis-global-algo",
+    storageBucket: "omnis-global-algo.firebasestorage.app",
+    messagingSenderId: "585093182907",
+    appId: "1:585093182907:web:c66c4cf3b51c44b9f7c09e"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  // ---- LOAD USER PROFILE FROM FIRESTORE ----
+  async function loadUserProfile(user) {
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      let name, userId;
+      if (snap.exists()) {
+        name = snap.data().name || user.displayName || user.email.split('@')[0];
+        userId = snap.data().userId;
+      } else {
+        name = user.displayName || user.email.split('@')[0];
+        userId = 'AR' + Math.floor(Math.random() * 999999);
+        await setDoc(doc(db, 'users', user.uid), {
+          name,
+          email: user.email,
+          userId,
+          createdAt: new Date().toISOString()
+        });
+      }
+      state.user.name = name;
+      state.user.id = userId;
+      state.user.uid = user.uid;
+      state.user.email = user.email;
+      state.user.initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      updateUserUI();
+      await loadUserStrategies(user.uid);
+      await loadUserBrokers(user.uid);
+      document.querySelectorAll('.auth-page').forEach(el => el.classList.add('hidden'));
+      document.getElementById('disclaimerModal').classList.remove('hidden');
+    } catch (e) {
+      showToast('Error loading profile: ' + e.message);
+    }
+  }
+
+  // ---- LOAD STRATEGIES ----
+  async function loadUserStrategies(uid) {
+    try {
+      const snap = await getDocs(collection(db, 'users', uid, 'strategies'));
+      state.myStrategies = [];
+      snap.forEach(d => state.myStrategies.push({ id: d.id, ...d.data() }));
+      renderMyStrategies();
+    } catch(e) { console.log('strategies load error', e); }
+  }
+
+  // ---- LOAD BROKERS ----
+  async function loadUserBrokers(uid) {
+    try {
+      const snap = await getDocs(collection(db, 'users', uid, 'brokers'));
+      const card = document.getElementById('brokerListCard');
+      // clear existing dynamic rows (keep first Angel row)
+      card.querySelectorAll('.firebase-broker-row').forEach(r => r.remove());
+      snap.forEach(d => {
+        const data = d.data();
+        const row = document.createElement('div');
+        row.className = 'broker-row firebase-broker-row';
+        row.innerHTML = `
+          <div class="broker-logo">🔵</div>
+          <div class="broker-info">
+            <strong>${data.name}</strong>
+            <span>${data.clientId}</span><br>
+            <span>Static IP: Not Assigned</span><br>
+            <span style="color:var(--success)">Connected</span>
+          </div>
+          <div style="flex:1"></div>
+          <div class="broker-perf"><span>Strategy Performance</span><strong>0.00</strong></div>
+          <div class="broker-toggles">
+            <div class="toggle-item"><span>Terminal</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-item"><span>Trading Engine</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <button class="kebab" onclick="window.firebaseDeleteBroker('${d.id}', this)">⋮</button>
+        `;
+        card.appendChild(row);
+      });
+    } catch(e) { console.log('brokers load error', e); }
+  }
+
+  // ---- FIREBASE LOGIN ----
+  window.firebaseLogin = async function() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pw = document.getElementById('loginPassword').value;
+    if (!email || !pw) { showToast('Please fill all fields'); return; }
+    try {
+      showToast('Signing in...');
+      const result = await signInWithEmailAndPassword(auth, email, pw);
+      await loadUserProfile(result.user);
+    } catch(e) {
+      if (e.code === 'auth/user-not-found') showToast('No account found with this email');
+      else if (e.code === 'auth/wrong-password') showToast('Incorrect password');
+      else if (e.code === 'auth/invalid-email') showToast('Invalid email address');
+      else showToast('Login failed: ' + e.message);
+    }
+  }
+
+  // ---- GOOGLE LOGIN ----
+  window.firebaseGoogleLogin = async function() {
+    try {
+      showToast('Opening Google login...');
+      const result = await signInWithPopup(auth, googleProvider);
+      await loadUserProfile(result.user);
+    } catch(e) {
+      if (e.code === 'auth/popup-closed-by-user') showToast('Google login cancelled');
+      else showToast('Google login failed: ' + e.message);
+    }
+  }
+
+  // ---- REGISTER ----
+  window.firebaseRegister = async function() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pw = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regConfirm').value;
+    if (!name || !email || !pw) { showToast('Please fill all fields'); return; }
+    if (pw !== confirm) { showToast('Passwords do not match'); return; }
+    if (pw.length < 6) { showToast('Password must be at least 6 characters'); return; }
+    try {
+      showToast('Creating account...');
+      const result = await createUserWithEmailAndPassword(auth, email, pw);
+      const userId = 'AR' + Math.floor(Math.random() * 999999);
+      await setDoc(doc(db, 'users', result.user.uid), {
+        name, email, userId, createdAt: new Date().toISOString()
+      });
+      await loadUserProfile(result.user);
+    } catch(e) {
+      if (e.code === 'auth/email-already-in-use') showToast('Email already registered. Please sign in.');
+      else if (e.code === 'auth/invalid-email') showToast('Invalid email address');
+      else showToast('Registration failed: ' + e.message);
+    }
+  }
+
+  // ---- FORGOT PASSWORD ----
+  window.firebaseForgotPassword = async function() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if (!email) { showToast('Enter your email address'); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showToast('Reset link sent to ' + email);
+      setTimeout(() => showPage('signInPage'), 2000);
+    } catch(e) {
+      if (e.code === 'auth/user-not-found') showToast('No account found with this email');
+      else showToast('Error: ' + e.message);
+    }
+  }
+
+  // ---- LOGOUT ----
+  window.firebaseLogout = async function() {
+    try {
+      await signOut(auth);
+      state.myStrategies = [];
+      state.user = { name: '', id: '', email: '', initials: '', uid: '' };
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('profileDropdown').classList.remove('open');
+      showPage('signInPage');
+    } catch(e) { showToast('Logout error: ' + e.message); }
+  }
+
+  // ---- SAVE STRATEGY TO FIRESTORE ----
+  window.firebaseSaveStrategy = async function(name, type, desc) {
+    if (!state.user.uid) { showToast('Not logged in'); return; }
+    if (state.myStrategies.find(s => s.name === name)) {
+      showToast(name + ' already in My Strategies'); return;
+    }
+    try {
+      const ref = await addDoc(collection(db, 'users', state.user.uid, 'strategies'), {
+        name, type, desc, createdAt: new Date().toISOString()
+      });
+      state.myStrategies.push({ id: ref.id, name, type, desc });
+      renderMyStrategies();
+      showToast(name + ' added to My Strategies!');
+    } catch(e) { showToast('Error saving strategy: ' + e.message); }
+  }
+
+  // ---- DELETE STRATEGY ----
+  window.firebaseDeleteStrategy = async function(id, el) {
+    if (!state.user.uid) return;
+    try {
+      await deleteDoc(doc(db, 'users', state.user.uid, 'strategies', id));
+      state.myStrategies = state.myStrategies.filter(s => s.id !== id);
+      renderMyStrategies();
+      showToast('Strategy removed');
+    } catch(e) { showToast('Error: ' + e.message); }
+  }
+
+  // ---- SAVE BROKER TO FIRESTORE ----
+  window.firebaseSaveBroker = async function() {
+    if (!state.user.uid) { showToast('Not logged in'); return; }
+    if (!state.selectedBrokerName) { showToast('Select a broker'); return; }
+    const clientId = document.getElementById('brokerClientId').value.trim();
+    if (!clientId) { showToast('Enter Client ID / API Key'); return; }
+    try {
+      const ref = await addDoc(collection(db, 'users', state.user.uid, 'brokers'), {
+        name: state.selectedBrokerName,
+        clientId,
+        connected: true,
+        createdAt: new Date().toISOString()
+      });
+      closeModal('addBrokerModal');
+      showToast(state.selectedBrokerName + ' connected!');
+      const card = document.getElementById('brokerListCard');
+      const row = document.createElement('div');
+      row.className = 'broker-row firebase-broker-row';
+      row.innerHTML = `
+        <div class="broker-logo">🔵</div>
+        <div class="broker-info">
+          <strong>${state.selectedBrokerName}</strong>
+          <span>${clientId}</span><br>
+          <span>Static IP: Not Assigned</span><br>
+          <span style="color:var(--success)">Connected</span>
+        </div>
+        <div style="flex:1"></div>
+        <div class="broker-perf"><span>Strategy Performance</span><strong>0.00</strong></div>
+        <div class="broker-toggles">
+          <div class="toggle-item"><span>Terminal</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-item"><span>Trading Engine</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+        <button class="kebab" onclick="window.firebaseDeleteBroker('${ref.id}', this)">⋮</button>
+      `;
+      card.appendChild(row);
+      document.getElementById('brokerClientId').value = '';
+      document.getElementById('brokerSecret').value = '';
+    } catch(e) { showToast('Error saving broker: ' + e.message); }
+  }
+
+  // ---- DELETE BROKER ----
+  window.firebaseDeleteBroker = async function(id, el) {
+    if (!state.user.uid) return;
+    try {
+      await deleteDoc(doc(db, 'users', state.user.uid, 'brokers', id));
+      el.closest('.broker-row').remove();
+      showToast('Broker removed');
+    } catch(e) { showToast('Error: ' + e.message); }
+  }
+
+  // ---- SAVE PROFILE ----
+  window.firebaseSaveProfile = async function() {
+    if (!state.user.uid) { showToast('Not logged in'); return; }
+    const name = document.getElementById('profileNameInput').value.trim();
+    const email = document.getElementById('profileEmailInput').value.trim();
+    const phone = document.getElementById('profilePhoneInput').value.trim();
+    if (!name) { showToast('Name cannot be empty'); return; }
+    try {
+      await updateDoc(doc(db, 'users', state.user.uid), { name, email, phone });
+      state.user.name = name;
+      state.user.email = email;
+      state.user.initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      updateUserUI();
+      showToast('Profile saved successfully!');
+    } catch(e) { showToast('Error saving profile: ' + e.message); }
+  }
+
+  // ---- OVERRIDE HTML BUTTON FUNCTIONS ----
+  // Replace all inline onclick handlers to use Firebase versions
+  window.handleLogin = window.firebaseLogin;
+  window.handleGoogleLogin = window.firebaseGoogleLogin;
+  window.handleRegister = window.firebaseRegister;
+  window.handleForgot = window.firebaseForgotPassword;
+  window.handleLogout = window.firebaseLogout;
+  window.saveBroker = window.firebaseSaveBroker;
+  window.saveProfile = window.firebaseSaveProfile;
+  window.addToMyStrategy = window.firebaseSaveStrategy;
+
+  // ---- AUTO LOGIN — check if user already logged in ----
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // User already logged in — skip login page
+      if (document.getElementById('mainApp').classList.contains('hidden')) {
+        await loadUserProfile(user);
+        // Auto-accept disclaimer if returning user
+        document.getElementById('disclaimerModal').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        init();
+      }
+    }
+  });
+
+</script>
 </body>
 </html>
